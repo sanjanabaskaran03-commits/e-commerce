@@ -10,17 +10,17 @@ import { useCart } from '../../context/CartContext';
 import { sampleData } from '@/src/app/components/listviewpage/components/ProductList';
 import {
   AppBar, Toolbar, Typography, Box, IconButton, InputBase,
-  Button, Stack, MenuItem, Select, Container, Badge, Drawer, List, ListItem
+  Button, Stack, MenuItem, Select, Container, Badge, Drawer, List, ListItem, Menu
 } from '@mui/material';
 import {
   Person, Chat, Favorite, ShoppingCart,
-  WbSunny, DarkMode, ShoppingBag, Menu as MenuIcon
+  WbSunny, DarkMode, ShoppingBag, Menu as MenuIcon, Logout
 } from '@mui/icons-material';
 
 const BrandHeader = () => {
   const themeMode = useContext(ColorModeContext);
   const { cartItems } = useCart();
-  const { wishlistItems } = useWishlist(); // Now works because of the Provider
+  const { wishlistItems } = useWishlist(); 
   const router = useRouter();
   const searchParams = useSearchParams();
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -28,6 +28,7 @@ const BrandHeader = () => {
   const [searchCategory, setSearchCategory] = useState('All category');
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [activeSuggestion, setActiveSuggestion] = useState(-1);
+  const [profileAnchorEl, setProfileAnchorEl] = useState(null);
   const isDark = themeMode.mode === 'dark';
 
   const cartCount = cartItems.reduce((acc, item) => acc + item.qty, 0);
@@ -85,6 +86,19 @@ const BrandHeader = () => {
     router.push(query ? `/shop?${query}` : '/shop');
   };
 
+  const handleProfileOpen = (event) => {
+    setProfileAnchorEl(event.currentTarget);
+  };
+
+  const handleProfileClose = () => {
+    setProfileAnchorEl(null);
+  };
+
+  const handleProfileAction = (path) => {
+    handleProfileClose();
+    if (path) router.push(path);
+  };
+
   return (
     <AppBar 
       position="sticky" 
@@ -119,8 +133,8 @@ const BrandHeader = () => {
             </Stack>
 
             <Stack direction="row" alignItems="center" spacing={1} sx={{ display: { xs: 'flex', md: 'none' } }}>
-              <HeaderAction icon={<Person />} label="Profile" mobileHideLabel />
-              {/* Mobile Wishlist Icon */}
+              <HeaderAction icon={<Person />} label="Profile" mobileHideLabel onClick={handleProfileOpen} />
+           
               <HeaderAction icon={<Badge badgeContent={wishlistCount} color="error">
                 <Favorite/>
               </Badge>} />
@@ -325,10 +339,9 @@ const BrandHeader = () => {
           </Box>
 
           <Stack direction="row" spacing={2} alignItems="center" sx={{ display: { xs: 'none', md: 'flex' } }}>
-            <HeaderAction icon={<Person />} label="Profile" />
+            <HeaderAction icon={<Person />} label="Profile" onClick={handleProfileOpen} />
             <HeaderAction icon={<Chat />} label="Message" />
             
-            {/* Desktop Wishlist */}
             <HeaderAction 
               icon={
                 <Badge badgeContent={wishlistCount} color="error">
@@ -354,6 +367,24 @@ const BrandHeader = () => {
           </Stack>
         </Toolbar>
       </Container>
+
+      <Menu
+        anchorEl={profileAnchorEl}
+        open={Boolean(profileAnchorEl)}
+        onClose={handleProfileClose}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+      >
+        <MenuItem disabled>Account holder: Guest</MenuItem>
+        <MenuItem onClick={() => handleProfileAction('/history')}>Browsing history</MenuItem>
+        <MenuItem onClick={() => handleProfileAction('/settings')}>Account settings</MenuItem>
+        <MenuItem onClick={() => handleProfileAction('/logout')}>
+          <Stack direction="row" spacing={1} alignItems="center">
+            <Logout fontSize="small" />
+            <Typography>Logout</Typography>
+          </Stack>
+        </MenuItem>
+      </Menu>
 
       <Drawer anchor="left" open={drawerOpen} onClose={() => setDrawerOpen(false)}>
         <Box sx={{ width: 250 }} onClick={() => setDrawerOpen(false)}>

@@ -13,7 +13,7 @@ import { useWishlist } from '@/src/app/context/WishlistContext';
 
 const MotionCard = motion.create(Card);
 
-const ProductCard = ({ product, viewMode = 'list' }) => {
+const ProductCard = ({ product, viewMode = 'list', isFirst = false }) => {
   const { addToCart } = useCart();
   const router = useRouter();
   const { toggleWishlist, isInWishlist } = useWishlist(); // Use global context
@@ -77,6 +77,9 @@ const ProductCard = ({ product, viewMode = 'list' }) => {
           src={product.img} 
           alt={product.title}
           fill 
+          sizes={isGrid ? "(max-width: 600px) 50vw, (max-width: 900px) 33vw, 200px" : "180px"}
+          loading={isFirst ? "eager" : "lazy"}
+          priority={isFirst}
           style={{ 
             objectFit: 'contain', 
             padding: '8px' 
@@ -87,53 +90,73 @@ const ProductCard = ({ product, viewMode = 'list' }) => {
       <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
         {isGrid ? (
           <Stack spacing={0.5} sx={{ width: '100%' }}>
-            <Stack direction="row" justifyContent="space-between" alignItems="flex-start" sx={{ width: '100%' }}>
+            <Stack direction="row" justifyContent="space-between" alignItems="flex-start" sx={{ width: '100%', minWidth: 0 }}>
               <Typography
                 sx={{
                   fontWeight: 500,
                   color: 'text.primary',
-                  fontSize: { xs: '14px', sm: '15px' },
+                  fontSize: { xs: '12px', sm: '14px' },
                   lineHeight: 1.4,
                   mr: 1,
+                  whiteSpace: 'normal',
                 }}
               >
                 {product.title}
               </Typography>
               <Stack direction="row" spacing={0.5}>
                 <IconButton
-                  size="small"
-                  onClick={handleCartClick}
-                  sx={{ border: '1px solid', borderColor: isDark ? '#30363D' : '#DEE2E7', borderRadius: '6px', color: '#0D6EFD','&:focus':{outline:'none'} }}
-                >
-                  <ShoppingCartOutlinedIcon fontSize="small" />
-                </IconButton>
-                <IconButton
-                  size="small"
-                  onClick={handleWishlistClick}
-                  sx={{
-                    border: isWishlisted ? 'none' : '1px solid',
-                    borderColor: isDark ? '#30363D' : '#DEE2E7',
-                    borderRadius: '6px',
-                    color: isWishlisted ? '#fff' : '#0D6EFD',
-                    bgcolor: isWishlisted ? '#0D6EFD' : 'transparent',
-                    '&:focus': { outline: 'none' },
-                  }}
-                >
-                  {isWishlisted ? <FavoriteIcon fontSize="small" /> : <FavoriteBorderIcon fontSize="small" />}
-                </IconButton>
-              </Stack>
+                size="small"
+                onClick={handleCartClick}
+                sx={{
+                  border: '1px solid',
+                  borderColor: isDark ? '#30363D' : '#DEE2E7',
+                  borderRadius: '6px',
+                  color: '#0D6EFD',
+                  '&:focus':{outline:'none'},
+                  p: { xs: 0.5, sm: 0.75 },
+                }}
+              >
+                <ShoppingCartOutlinedIcon sx={{ fontSize: { xs: '0.9rem', sm: '1rem' } }} />
+              </IconButton>
+              <IconButton
+                size="small"
+                onClick={handleWishlistClick}
+                sx={{
+                  border: isWishlisted ? 'none' : '1px solid',
+                  borderColor: isDark ? '#30363D' : '#DEE2E7',
+                  borderRadius: '6px',
+                  color: isWishlisted ? '#fff' : '#0D6EFD',
+                  bgcolor: isWishlisted ? '#0D6EFD' : 'transparent',
+                  '&:focus': { outline: 'none' },
+                  p: { xs: 0.5, sm: 0.75 },
+                }}
+              >
+                {isWishlisted
+                  ? <FavoriteIcon sx={{ fontSize: { xs: '0.9rem', sm: '1rem' } }} />
+                  : <FavoriteBorderIcon sx={{ fontSize: { xs: '0.9rem', sm: '1rem' } }} />
+                }
+              </IconButton>
+            </Stack>
             </Stack>
 
             <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ width: '100%' }}>
               <Typography
                 sx={{
                   fontWeight: 600,
-                  fontSize: { xs: '16px', sm: '18px' },
+                  fontSize: { xs: '14px', sm: '16px' },
                   color: 'text.primary',
                 }}
               >
                 ${product.price}
               </Typography>
+              <Box sx={{ display: { xs: 'block', sm: 'none' } }}>
+                <Typography sx={{ fontSize: '12px', color: 'text.secondary' }}>
+                  {Number(product.rating).toFixed(1)} stars
+                </Typography>
+              </Box>
+              <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
+                <Rating value={Number(product.rating)} readOnly precision={0.1} size="small" />
+              </Box>
             </Stack>
           </Stack>
         ) : (
@@ -179,15 +202,14 @@ const ProductCard = ({ product, viewMode = 'list' }) => {
           </>
         )}
         
-        <Stack direction="row" spacing={1} alignItems="center" sx={{ mt: 0.5 }}>
-          <Rating value={Number(product.rating)} readOnly precision={0.1} size="small" />
-          <Typography
-            variant="body2"
-            sx={{ color: 'text.secondary', fontSize: isGrid ? { xs: '12px', sm: '13px' } : 'inherit' }}
-          >
-            {product.orders} orders
-          </Typography>
-        </Stack>
+        {!isGrid && (
+          <Stack direction="row" spacing={1} alignItems="center" sx={{ mt: 0.5 }}>
+            <Rating value={Number(product.rating)} readOnly precision={0.1} size="small" />
+            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+              {product.orders} orders
+            </Typography>
+          </Stack>
+        )}
 
         <Typography
           variant="body2"
@@ -196,7 +218,7 @@ const ProductCard = ({ product, viewMode = 'list' }) => {
             mt: 1,
             mb: 1,
             WebkitLineClamp: 2,
-            display: '-webkit-box',
+            display: isGrid ? { xs: 'none', sm: '-webkit-box' } : '-webkit-box',
             WebkitBoxOrient: 'vertical',
             overflow: 'hidden',
             fontSize: isGrid ? { xs: '12px', sm: '13px' } : 'inherit',

@@ -63,7 +63,7 @@ import welding from '@/public/images/listviewpage/machinery tools/welding.jpg'
 
 export const sampleData = [
   { id: 1, title: 'iPhone 14 Pro Max', price: '1099.00', rating: 5, orders: 154, description: 'Plastic cover, Super power, iOS 16', img: Iphone, category: 'Mobiles' },
-  { id: 2, title: 'Samsung S23 Ultra', price: '998.00', rating: 4, orders: 120, description: 'Metallic body, 8GB Ram, Large Memory', img: Samsung, category: 'Mobiles' },
+  { id: 2, title: 'Samsung S23 Ultra', price: '998.00', rating: 3, orders: 120, description: 'Metallic body, 8GB Ram, Large Memory', img: Samsung, category: 'Mobiles' },
   { id: 3, title: 'Xiaomi Redmi Note 12', price: '299.00', rating: 3, orders: 85, description: 'Plastic cover, Large Memory, Fast charging', img: Xiaomi, category: 'Mobiles' },
   { id: 4, title: 'Google Pixel 7', price: '599.00', rating: 4, orders: 60, description: 'Metallic finish, Super power camera', img: Google, category: 'Mobiles' },
   { id: 5, title: 'OnePlus 11 5G', price: '649.00', rating: 5, orders: 95, description: '8GB Ram, Metallic, Super power battery', img: Oneplus, category: 'Mobiles' },
@@ -76,9 +76,9 @@ export const sampleData = [
 
   { id: 11, title: 'MacBook Air M2', price: '1199.00', rating: 5, orders: 300, description: '8GB Ram, Metallic, Super power M2 chip', img: MacBook, category: 'Computer and tech' },
   { id: 12, title: 'Canon EOS R5', price: '3500.00', rating: 5, orders: 12, description: 'Professional tech, 8K video, Metallic', img:Canon, category: 'Computer and tech' },
-  { id: 13, title: 'Dell XPS 13', price: '950.00', rating: 4, orders: 80, description: '8GB Ram, Metallic body, Windows 11', img: Dell, category: 'Computer and tech' },
+  { id: 13, title: 'Dell XPS 13', price: '950.00', rating: 3, orders: 80, description: '8GB Ram, Metallic body, Windows 11', img: Dell, category: 'Computer and tech' },
   { id: 14, title: 'Mechanical Gaming Keyboard', price: '85.00', rating: 4, orders: 400, description: 'Metallic plate, RGB lighting, 8GB Ram storage', img: Keyboard, category: 'Computer and tech' },
-  { id: 15, title: 'Logitech G-Pro Mouse', price: '120.00', rating: 5, orders: 600, description: 'Plastic cover, Lightweight, Modern tech', img: mouse, category: 'Computer and tech' },
+  { id: 15, title: 'Logitech G-Pro Mouse', price: '120.00', rating: 2, orders: 600, description: 'Plastic cover, Lightweight, Modern tech', img: mouse, category: 'Computer and tech' },
 
   { id: 16, title: 'Modern Velvet Sofa', price: '850.00', rating: 5, orders: 40, description: 'Soft velvet, Metallic legs, Luxury', img: Sofa, category: 'Home interiors' },
   { id: 17, title: 'Wooden Dining Table', price: '450.00', rating: 4, orders: 20, description: 'Solid wood, fits 6 persons', img: Table, category: 'Home interiors' },
@@ -88,7 +88,7 @@ export const sampleData = [
 
   { id: 21, title: 'Huawei Watch GT 3', price: '240.00', rating: 4, orders: 154, description: 'Metallic, Water resistant, Modern tech', img: Watch, category: 'Accessories' },
   { id: 22, title: 'Sony WH-1000XM5', price: '350.00', rating: 5, orders: 200, description: 'Plastic cover, Super power noise cancelling', img: Headphone, category: 'Accessories' },
-  { id: 23, title: 'Apple Watch Series 8', price: '399.00', rating: 5, orders: 320, description: 'Metallic, Always-on display', img: Applewatch, category: 'Accessories' },
+  { id: 23, title: 'Apple Watch Series 8', price: '399.00', rating: 3, orders: 320, description: 'Metallic, Always-on display', img: Applewatch, category: 'Accessories' },
   { id: 24, title: 'Leather Travel Bag', price: '80.00', rating: 4, orders: 90, description: 'Large Memory space, Premium finish', img: Bag, category: 'Accessories' },
   { id: 25, title: 'Samsung Galaxy Buds 2', price: '120.00', rating: 4, orders: 450, description: 'Plastic cover, compact tech', img:Headphone1, category: 'Accessories' },
 
@@ -102,13 +102,13 @@ export const sampleData = [
 { id: 32, title: 'Camping Tent 4-Person', price: '130.00', rating: 4, orders: 90, description: 'Waterproof, Portable, Lightweight, Minimalist design', img: download, category: 'Sports and outdoor' },
 { id: 33, title: 'Yoga Mat Premium', price: '40.00', rating: 5, orders: 300, description: 'Soft, Non-slip material, Eco-friendly', img: yogamat, category: 'Sports and outdoor' },
 { id: 34, title: 'Dumbbell Set 20kg', price: '75.00', rating: 4, orders: 110, description: 'Metallic, Heavy Duty, Professional gym gear', img: dumbbell, category: 'Sports and outdoor' },
-{ id: 35, title: 'Waterproof Backpack', price: '65.00', rating: 4, orders: 200, description: 'Waterproof, Durable, New Arrival, Large capacity', img: Backpack, category: 'Sports and outdoor' },
+{ id: 35, title: 'Waterproof Backpack', price: '65.00', rating: 3, orders: 200, description: 'Waterproof, Durable, New Arrival, Large capacity', img: Backpack, category: 'Sports and outdoor' },
 
 { id: 36, title: 'Orthopedic Dog Bed', price: '85.00', rating: 5, orders: 75, description: 'Soft, Memory foam, Washable cover, Luxury', img: Bed, category: 'Animal and pets' },
 { id: 37, title: 'Automatic Pet Feeder', price: '110.00', rating: 4, orders: 45, description: 'Modern tech, Plastic cover, Smart scheduling', img: feeder, category: 'Animal and pets' },
-{ id: 38, title: 'Leather Cat Collar', price: '15.00', rating: 5, orders: 500, description: 'Leather, Metallic buckle, New Arrival', img: collar, category: 'Animal and pets' },
+{ id: 38, title: 'Leather Cat Collar', price: '15.00', rating: 3, orders: 500, description: 'Leather, Metallic buckle, New Arrival', img: collar, category: 'Animal and pets' },
 { id: 39, title: 'Pet Grooming Kit', price: '45.00', rating: 4, orders: 130, description: 'Professional, Electric, Low noise tech', img: kit, category: 'Animal and pets' },
-{ id: 40, title: 'Bird Cage Large', price: '140.00', rating: 3, orders: 20, description: 'Metallic, Heavy Duty, Spacious design', img: cage, category: 'Animal and pets' },
+{ id: 40, title: 'Bird Cage Large', price: '140.00', rating: 5, orders: 20, description: 'Metallic, Heavy Duty, Spacious design', img: cage, category: 'Animal and pets' },
 
 { id: 41, title: 'Industrial Air Compressor', price: '450.00', rating: 5, orders: 15, description: 'Heavy Duty, Professional, Steel, Electric', img: compressor, category: 'Machinery tools' },
 { id: 42, title: 'Bench Grinder 8-Inch', price: '180.00', rating: 4, orders: 30, description: 'Metallic, Professional, Electric, High speed', img: grinder, category: 'Machinery tools' },
@@ -210,20 +210,22 @@ const ProductList = ({
           sx={{
             display: isGrid ? 'flex' : 'block',
             flexWrap: isGrid ? 'wrap' : 'nowrap',
-            gap: isGrid ? 2 : 0,
+            gap: isGrid ? 1 : 0,
+            width: '100%',
           }}
         >
-          {sortedProducts.map(item => (
+          {sortedProducts.map((item, index) => (
             <Box
               key={item.id}
               onClick={() => router.push(`/detail/${item.id}`)}
               sx={{
                 cursor: 'pointer',
-                flex: isGrid ? { xs: '1 1 calc(50% - 16px)', sm: '1 1 calc(50% - 16px)', md: '1 1 calc(33.333% - 16px)' } : '1 1 auto',
-                maxWidth: isGrid ? { xs: 'calc(50% - 16px)', sm: 'calc(50% - 16px)', md: 'calc(33.333% - 16px)' } : '100%',
+                flex: isGrid ? { xs: '1 1 calc(50% - 8px)', sm: '1 1 calc(50% - 8px)', md: '1 1 calc(33.333% - 8px)' } : '1 1 auto',
+                maxWidth: isGrid ? { xs: 'calc(50% - 8px)', sm: 'calc(50% - 8px)', md: 'calc(33.333% - 8px)' } : '100%',
+                boxSizing: 'border-box',
               }}
             >
-              <ProductCard product={item} viewMode={viewMode} />
+              <ProductCard product={item} viewMode={viewMode} isFirst={index === 0} />
             </Box>
           ))}
         </Box>
