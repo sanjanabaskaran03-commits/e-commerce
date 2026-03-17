@@ -127,6 +127,7 @@ const ProductList = ({
   const router = useRouter();
   const searchParams = useSearchParams();
   const categoryQuery = searchParams.get('category');
+  const searchQuery = searchParams.get('search');
 
   const formatTitle = (text) => {
     if (!text) return "";
@@ -140,6 +141,7 @@ const ProductList = ({
 
   const filteredProducts = sampleData.filter(product => {
     const formattedQuery = categoryQuery ? categoryQuery.replace(/-/g, ' ') : null;
+    const searchTerm = searchQuery ? searchQuery.trim().toLowerCase() : '';
 
     const productPrice = parseFloat(product.price);
     if (productPrice < priceRange[0] || productPrice > priceRange[1]) {
@@ -148,6 +150,13 @@ const ProductList = ({
 
     if (verifiedOnly && !isVerified(product)) {
       return false;
+    }
+
+    if (searchTerm) {
+      const haystack = `${product.title} ${product.description} ${product.category}`.toLowerCase();
+      if (!haystack.includes(searchTerm)) {
+        return false;
+      }
     }
 
     if (activeFilters.length > 0) {

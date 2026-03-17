@@ -18,6 +18,7 @@ const ListContent = () => {
   const [verifiedOnly, setVerifiedOnly] = useState(false);
   const [sortOption, setSortOption] = useState("Featured");
   const [viewMode, setViewMode] = useState("list");
+  const [priceRange, setPriceRange] = useState([0, 5000]);
   const searchParams = useSearchParams();
 
   // 1. Extract the category from the URL (?category=mobile-accessory)
@@ -43,6 +44,8 @@ const ListContent = () => {
             <FilterSidebar 
               activeFilters={activeFilters} 
               onFilterToggle={handleFilterToggle} 
+              priceRange={priceRange}
+              onPriceChange={setPriceRange}
             />
           </Box>
 
@@ -58,6 +61,8 @@ const ListContent = () => {
               onSortChange={setSortOption}
               viewMode={viewMode}
               onViewModeChange={setViewMode}
+              priceRange={priceRange}
+              onPriceChange={setPriceRange}
             />
             
             {activeFilters.length > 0 && (
@@ -94,6 +99,7 @@ const ListContent = () => {
               <ProductList
                 category={category}
                 activeFilters={activeFilters}
+                priceRange={priceRange}
                 verifiedOnly={verifiedOnly}
                 sortOption={sortOption}
                 viewMode={viewMode}

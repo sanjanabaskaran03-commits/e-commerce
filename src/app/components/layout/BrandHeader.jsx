@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useWishlist } from '@/src/app/context/WishlistContext';
 import { ColorModeContext } from '../../context/ThemeContext';
 import { useCart } from '../../context/CartContext';
+import { sampleData } from '@/src/app/components/listviewpage/components/ProductList';
 import {
   AppBar, Toolbar, Typography, Box, IconButton, InputBase,
   Button, Stack, MenuItem, Select, Container, Badge, Drawer, List, ListItem
@@ -20,11 +21,60 @@ const BrandHeader = () => {
   const { cartItems } = useCart();
   const { wishlistItems } = useWishlist(); // Now works because of the Provider
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchCategory, setSearchCategory] = useState('All category');
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [activeSuggestion, setActiveSuggestion] = useState(-1);
   const isDark = themeMode.mode === 'dark';
 
   const cartCount = cartItems.reduce((acc, item) => acc + item.qty, 0);
   const wishlistCount = wishlistItems.length;
+  const productCategories = useMemo(
+    () => [...new Set(sampleData.map(item => item.category))],
+    []
+  );
+  const searchSuggestions = useMemo(() => {
+    const titles = sampleData.map(item => item.title);
+    return [...new Set(titles)];
+  }, []);
+  const filteredSuggestions = useMemo(() => {
+    const term = searchTerm.trim().toLowerCase();
+    if (!term) return [];
+    return searchSuggestions
+      .filter(item => item.toLowerCase().includes(term))
+      .slice(0, 6);
+  }, [searchTerm, searchSuggestions]);
+
+  const toCategoryLabel = (value) => {
+    if (!value) return 'All category';
+    const normalized = value.replace(/-/g, ' ').toLowerCase();
+    const match = productCategories.find(c => c.toLowerCase() === normalized);
+    return match || 'All category';
+  };
+
+  useEffect(() => {
+    const term = searchParams.get('search') || '';
+    const category = searchParams.get('category');
+    setSearchTerm(term);
+    setSearchCategory(toCategoryLabel(category));
+  }, [searchParams]);
+
+  useEffect(() => {
+    setActiveSuggestion(-1);
+  }, [searchTerm]);
+
+  const handleSearch = () => {
+    const params = new URLSearchParams();
+    const trimmed = searchTerm.trim();
+    if (trimmed) params.set('search', trimmed);
+    if (searchCategory && searchCategory !== 'All category') {
+      params.set('category', searchCategory.toLowerCase().replace(/\s+/g, '-'));
+    }
+    const query = params.toString();
+    router.push(query ? `/shop?${query}` : '/shop');
+  };
 
   return (
     <AppBar 
@@ -83,40 +133,129 @@ const BrandHeader = () => {
             </Stack>
           </Stack>
 
-          <Box 
-            sx={{ 
-              display: { xs: 'none', md: 'flex' }, 
-              alignItems: 'center', 
-              flex: 1, 
-              maxWidth: '660px', 
-              height: '44px', 
-              border: '2px solid',
-              borderColor: '#0D6EFD', 
-              borderRadius: '8px', 
-              overflow: 'hidden', 
-              bgcolor: 'background.paper'
+          <Box
+            sx={{
+              display: { xs: 'none', md: 'flex' },
+              alignItems: 'center',
+              flex: 1,
+              maxWidth: '660px',
+              position: 'relative',
             }}
           >
-            <InputBase 
-              placeholder="Search" 
-              sx={{ ml: 2, flex: 1, fontSize: '0.95rem', color: 'text.primary' }} 
-            />
-            <Select 
-              defaultValue="All category" 
-              variant="standard" 
-              disableUnderline 
-              sx={{ width: 'auto', minWidth: '130px', px: 1, color: 'text.primary' }}
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                width: '100%',
+                height: '44px',
+                border: '2px solid',
+                borderColor: '#0D6EFD',
+                borderRadius: '8px',
+                overflow: 'hidden',
+                bgcolor: 'background.paper',
+              }}
             >
-              <MenuItem value="All category">All category</MenuItem>
-              <MenuItem value="Gadgets">Gadgets</MenuItem>
-            </Select>
-            <Button 
-              variant="contained" 
-              disableElevation 
-              sx={{ height: '100%', borderRadius: 0, px: 4, bgcolor: '#0D6EFD', textTransform: 'none' }}
-            >
-              Search
-            </Button>
+              <InputBase
+                placeholder="Search"
+                value={searchTerm}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  setShowSuggestions(true);
+                }}
+                onFocus={() => setShowSuggestions(true)}
+                onBlur={() => setTimeout(() => setShowSuggestions(false), 100)}
+                onKeyDown={(e) => {
+                  if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    if (filteredSuggestions.length === 0) return;
+                    setShowSuggestions(true);
+                    setActiveSuggestion((prev) =>
+                      prev >= filteredSuggestions.length - 1 ? 0 : prev + 1
+                    );
+                  } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    if (filteredSuggestions.length === 0) return;
+                    setShowSuggestions(true);
+                    setActiveSuggestion((prev) =>
+                      prev <= 0 ? filteredSuggestions.length - 1 : prev - 1
+                    );
+                  } else if (e.key === 'Enter') {
+                    if (showSuggestions && activeSuggestion >= 0) {
+                      const selected = filteredSuggestions[activeSuggestion];
+                      if (selected) {
+                        setSearchTerm(selected);
+                        setShowSuggestions(false);
+                        return;
+                      }
+                    }
+                    handleSearch();
+                  } else if (e.key === 'Escape') {
+                    setShowSuggestions(false);
+                  }
+                }}
+                inputProps={{ autoComplete: 'off' }}
+                sx={{ ml: 2, flex: 1, fontSize: '0.95rem', color: 'text.primary' }}
+              />
+              <Select
+                value={searchCategory}
+                onChange={(e) => setSearchCategory(e.target.value)}
+                variant="standard"
+                disableUnderline
+                sx={{ width: 'auto', minWidth: '130px', px: 1, color: 'text.primary' }}
+              >
+                <MenuItem value="All category">All category</MenuItem>
+                {productCategories.map((cat) => (
+                  <MenuItem key={cat} value={cat}>{cat}</MenuItem>
+                ))}
+              </Select>
+              <Button
+                variant="contained"
+                disableElevation
+                onClick={handleSearch}
+                sx={{ height: '100%', borderRadius: 0, px: 4, bgcolor: '#0D6EFD', textTransform: 'none' }}
+              >
+                Search
+              </Button>
+            </Box>
+
+            {showSuggestions && filteredSuggestions.length > 0 && (
+              <Box
+                sx={{
+                  position: 'absolute',
+                  top: '46px',
+                  left: 0,
+                  right: 0,
+                  bgcolor: 'background.paper',
+                  border: '1px solid',
+                  borderColor: 'divider',
+                  borderRadius: '8px',
+                  boxShadow: 2,
+                  zIndex: 1200,
+                }}
+              >
+                {filteredSuggestions.map((item, index) => (
+                  <Box
+                    key={item}
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => {
+                      setSearchTerm(item);
+                      setShowSuggestions(false);
+                    }}
+                    sx={{
+                      px: 2,
+                      py: 1,
+                      cursor: 'pointer',
+                      bgcolor: activeSuggestion === index ? 'action.hover' : 'transparent',
+                      '&:hover': { bgcolor: 'action.hover' },
+                    }}
+                  >
+                    <Typography sx={{ fontSize: '0.9rem', color: 'text.primary' }}>
+                      {item}
+                    </Typography>
+                  </Box>
+                ))}
+              </Box>
+            )}
           </Box>
 
           <Stack direction="row" spacing={2} alignItems="center" sx={{ display: { xs: 'none', md: 'flex' } }}>

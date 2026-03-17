@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Box, Typography, Divider, Accordion, AccordionSummary, Link, 
   AccordionDetails, Checkbox, FormControlLabel, Stack, TextField, 
@@ -31,9 +31,19 @@ const FilterSection = ({ title, children, onSeeAll, hasMore = false, seeAllText 
   </Accordion>
 );
 
-const FilterSidebar = ({ activeFilters = [], onFilterToggle, isMobileDrawer = false }) => {
-  const [priceRange, setPriceRange] = useState([0, 1000]);
+const FilterSidebar = ({
+  activeFilters = [],
+  onFilterToggle,
+  isMobileDrawer = false,
+  priceRange = [0, 1000],
+  onPriceChange,
+}) => {
   const [expandedSections, setExpandedSections] = useState({});
+  const [draftPrice, setDraftPrice] = useState(priceRange);
+
+  useEffect(() => {
+    setDraftPrice(priceRange);
+  }, [priceRange]);
   const searchParams = useSearchParams();
   const router = useRouter(); 
   
@@ -89,6 +99,10 @@ const FilterSidebar = ({ activeFilters = [], onFilterToggle, isMobileDrawer = fa
   };
 
   const features = getFeatures();
+
+  const handleApplyPrice = () => {
+    onPriceChange?.(draftPrice);
+  };
 
   return (
     <Box sx={{ width: '100%' }}>
@@ -168,9 +182,9 @@ const FilterSidebar = ({ activeFilters = [], onFilterToggle, isMobileDrawer = fa
         {/* Price range */}
         <FilterSection title="Price range">
           <Stack spacing={2} sx={{ px: 1, mt: 1 }}>
-            <Slider 
-              value={priceRange} 
-              onChange={(e, newValue) => setPriceRange(newValue)} 
+            <Slider
+              value={draftPrice}
+              onChange={(e, newValue) => setDraftPrice(newValue)}
               min={0} max={5000} 
               sx={{ color: 'primary.main', height: 4 }} 
             />
@@ -178,19 +192,21 @@ const FilterSidebar = ({ activeFilters = [], onFilterToggle, isMobileDrawer = fa
               <TextField 
                 size="small" 
                 placeholder="Min" 
-                value={priceRange[0]} 
-                onChange={(e) => setPriceRange([Number(e.target.value), priceRange[1]])}
+                value={draftPrice[0]}
+                onChange={(e) => setDraftPrice([Number(e.target.value), draftPrice[1]])}
                 sx={{ bgcolor: 'background.paper' }} 
               />
               <TextField 
                 size="small" 
                 placeholder="Max" 
-                value={priceRange[1]} 
-                onChange={(e) => setPriceRange([priceRange[0], Number(e.target.value)])}
+                value={draftPrice[1]}
+                onChange={(e) => setDraftPrice([draftPrice[0], Number(e.target.value)])}
                 sx={{ bgcolor: 'background.paper' }} 
               />
             </Stack>
-            <Button variant="outlined" fullWidth sx={{ textTransform: 'none' }}>Apply</Button>
+            <Button variant="outlined" fullWidth onClick={handleApplyPrice} sx={{ textTransform: 'none' }}>
+              Apply
+            </Button>
           </Stack>
         </FilterSection>
 
