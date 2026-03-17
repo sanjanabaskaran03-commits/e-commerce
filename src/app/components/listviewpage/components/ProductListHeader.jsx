@@ -19,8 +19,6 @@ const ProductListHeader = ({
   onSortChange,
   viewMode,
   onViewModeChange,
-  priceRange,
-  onPriceChange,
 }) => {
   const [drawerOpen, setDrawerOpen] = useState(false);
 const formatCategory = (str) => {
@@ -95,9 +93,9 @@ const formatCategory = (str) => {
         direction="row" 
         justifyContent="space-between" 
         alignItems="center" 
-        sx={{ display: { xs: 'flex', md: 'none' }, gap: 1, flexWrap: 'nowrap' }}
+        sx={{ display: { xs: 'flex', md: 'none' } }}
       >
-        <Stack direction="row" spacing={1} alignItems="center" sx={{ minWidth: 0, flex: '1 1 auto' }}>
+        <Stack direction="row" spacing={1} alignItems="center">
           <Button 
             variant="outlined" 
             onClick={handleDrawerToggle(true)}
@@ -110,20 +108,14 @@ const formatCategory = (str) => {
             value={sortOption}
             onChange={(e) => onSortChange?.(e.target.value)}
             size="small"
-            sx={{
-              height: '32px',
-              minWidth: '110px',
-              maxWidth: '100%',
-              fontWeight: 400,
-              flex: '1 1 0',
-            }}
+            sx={{ height: '32px', minWidth: '110px', fontWeight: 400 }}
           >
             <MenuItem value="Featured">Featured</MenuItem>
             <MenuItem value="Newest">Newest items</MenuItem>
           </Select>
         </Stack>
         
-        <Stack direction="row" sx={{ border: '1px solid', borderColor: 'divider', borderRadius: '4px', flexShrink: 0 }}>
+        <Stack direction="row" sx={{ border: '1px solid', borderColor: 'divider', borderRadius: '4px' }}>
           <IconButton
             size="small"
             onClick={() => onViewModeChange?.('grid')}
@@ -168,8 +160,6 @@ const formatCategory = (str) => {
           activeFilters={activeFilters} 
           onFilterToggle={onFilterToggle} 
           isMobileDrawer={true} 
-          priceRange={priceRange}
-          onPriceChange={onPriceChange}
         />
         
         <Box sx={{ mt: 3 }}>
