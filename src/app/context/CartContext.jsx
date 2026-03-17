@@ -7,7 +7,6 @@ export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // 1. Fetch Cart on Load
 useEffect(() => {
     const fetchCart = async () => {
       setLoading(true);
@@ -15,15 +14,12 @@ useEffect(() => {
         const res = await fetch('/api/cart');
         const data = await res.json();
 
-        // If your MongoDB returns a cart object with an items array
         if (data && data.items) {
-          // Flatten the data: MongoDB usually stores { productId: {...}, qty: 1 }
-          // We map it to match the format your UI expects
           const formattedItems = data.items.map(item => ({
-            ...item.productId, // This spreads title, img, price from the populated Product
+            ...item.productId, 
             qty: item.qty,
             _id: item.productId._id,
-            id: item.productId._id // Ensure both id and _id exist
+            id: item.productId._id
           }));
           
           setCartItems(formattedItems);
@@ -37,9 +33,7 @@ useEffect(() => {
     fetchCart();
   }, []);
 
-  // 2. Update Quantity (MOVED OUTSIDE addToCart)
   const updateQuantity = async (productId, newQty) => {
-    // Update Local State immediately for a snappy UI
     setCartItems((prevItems) =>
       prevItems.map((item) =>
         (item.id === productId || item._id === productId || item.productId === productId) 
@@ -48,7 +42,6 @@ useEffect(() => {
       )
     );
 
-    // Sync with MongoDB (Fixes the 405 error if your API has PATCH/PUT)
     try {
       await fetch('/api/cart', {
         method: 'PATCH', 
@@ -60,7 +53,6 @@ useEffect(() => {
     }
   };
 
-  // 3. Add to Cart
   const addToCart = async (product) => {
     setCartItems((prev) => {
       const existingItem = prev.find((item) => item.id === product.id || item._id === product.id);
@@ -83,7 +75,6 @@ useEffect(() => {
     }
   };
 
-  // 4. Remove from Cart
   const removeFromCart = async (id) => {
     setCartItems((prev) => prev.filter(item => (item.id !== id && item._id !== id)));
     try {
@@ -98,7 +89,7 @@ useEffect(() => {
       cartItems, 
       addToCart, 
       removeFromCart, 
-      updateQuantity, // <--- CRITICAL: This was missing from value
+      updateQuantity, 
       loading 
     }}>
       {children}

@@ -13,7 +13,7 @@ import { useWishlist } from '@/src/app/context/WishlistContext';
 
 const MotionCard = motion.create(Card);
 
-const ProductCard = ({ product }) => {
+const ProductCard = ({ product, viewMode = 'list' }) => {
   const { addToCart } = useCart();
   const router = useRouter();
   const { toggleWishlist, isInWishlist } = useWishlist(); // Use global context
@@ -37,6 +37,8 @@ const ProductCard = ({ product }) => {
     addToCart(product);
   };
   
+  const isGrid = viewMode === 'grid';
+
   return (
     <MotionCard
       variant="outlined"
@@ -44,9 +46,10 @@ const ProductCard = ({ product }) => {
       animate={animate ? { scale: 1.02, rotate: 0.5 } : { scale: 1, rotate: 0 }}
       transition={{ type: "spring", stiffness: 300, damping: 15 }}
       sx={{ 
-        mb: 2, p: 2, 
+        mb: isGrid ? 0 : 2,
+        p: 2, 
         display: 'flex', 
-        flexDirection: { xs: 'column', sm: 'row' },
+        flexDirection: isGrid ? 'column' : { xs: 'column', sm: 'row' },
         gap: { xs: 2, md: 3 }, 
         borderRadius: '6px',
         bgcolor: 'background.paper',
@@ -58,8 +61,8 @@ const ProductCard = ({ product }) => {
     >
      <Box 
         sx={{ 
-          width: { xs: '100%', sm: 180 }, 
-          height: 180, 
+          width: isGrid ? '100%' : { xs: '100%', sm: 180 }, 
+          height: isGrid ? 200 : 180, 
           display: 'flex', 
           alignItems: 'center', 
           justifyContent: 'center', 

@@ -15,14 +15,13 @@ import LayoutContainer from '@/src/app/components/common/LayoutContainer';
 
 const ListContent = () => {
   const [activeFilters, setActiveFilters] = useState([]);
+  const [verifiedOnly, setVerifiedOnly] = useState(false);
+  const [sortOption, setSortOption] = useState("Featured");
+  const [viewMode, setViewMode] = useState("list");
   const searchParams = useSearchParams();
 
-  // Updated useEffect: We no longer push the URL category into activeFilters.
-  // This prevents the Category Name from showing up as a removable Chip.
-  useEffect(() => {
-    // Logic for category-specific side effects can go here if needed,
-    // but we are no longer adding searchParams categories to the activeFilters array.
-  }, [searchParams]);
+  // 1. Extract the category from the URL (?category=mobile-accessory)
+  const category = searchParams.get('category');
 
   const handleFilterToggle = (filterName) => {
     setActiveFilters((prev) =>
@@ -48,9 +47,17 @@ const ListContent = () => {
           </Box>
 
           <Box sx={{ flexGrow: 1, width: "100%" }}>
+            {/* 2. PASS THE CATEGORY HERE */}
             <ProductListHeader 
+              category={category} 
               activeFilters={activeFilters} 
               onFilterToggle={handleFilterToggle} 
+              verifiedOnly={verifiedOnly}
+              onVerifiedChange={setVerifiedOnly}
+              sortOption={sortOption}
+              onSortChange={setSortOption}
+              viewMode={viewMode}
+              onViewModeChange={setViewMode}
             />
             
             {activeFilters.length > 0 && (
@@ -83,7 +90,14 @@ const ListContent = () => {
             )}
 
             <Box sx={{ my: 2 }}>
-              <ProductList activeFilters={activeFilters} />
+              {/* 3. Also pass category to ProductList so you can filter your API results */}
+              <ProductList
+                category={category}
+                activeFilters={activeFilters}
+                verifiedOnly={verifiedOnly}
+                sortOption={sortOption}
+                viewMode={viewMode}
+              />
             </Box>
             <PaginationSection />
           </Box>
@@ -95,11 +109,9 @@ const ListContent = () => {
 
 const List = () => {
   return (
-    <>
-      <Suspense fallback={<Box sx={{ p: 5 }}>Loading products...</Box>}>
-        <ListContent />
-      </Suspense>
-    </>
+    <Suspense fallback={<Box sx={{ p: 5 }}>Loading products...</Box>}>
+      <ListContent />
+    </Suspense>
   );
 };
 

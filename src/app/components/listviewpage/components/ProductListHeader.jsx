@@ -9,9 +9,22 @@ import FilterListIcon from '@mui/icons-material/FilterList';
 import CloseIcon from '@mui/icons-material/Close';
 import FilterSidebar from './FilterSidebar'; 
 
-const ProductListHeader = ({ activeFilters, onFilterToggle }) => {
+const ProductListHeader = ({
+  category,
+  activeFilters,
+  onFilterToggle,
+  verifiedOnly,
+  onVerifiedChange,
+  sortOption,
+  onSortChange,
+  viewMode,
+  onViewModeChange,
+}) => {
   const [drawerOpen, setDrawerOpen] = useState(false);
-
+const formatCategory = (str) => {
+    if (!str) return "All Products";
+    return str.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+  };
   const handleDrawerToggle = (open) => () => {
     setDrawerOpen(open);
   };
@@ -27,20 +40,49 @@ const ProductListHeader = ({ activeFilters, onFilterToggle }) => {
     }}>
       <Box sx={{ display: { xs: 'none', md: 'flex' }, justifyContent: 'space-between', alignItems: 'center' }}>
         <Typography variant="body1">
-          12,011 items in <b>Mobile accessory</b>
+          Items in <b>{formatCategory(category)}</b>
         </Typography>
 
         <Stack direction="row" spacing={2} alignItems="center">
-          <FormControlLabel control={<Checkbox size="small" defaultChecked />} label="Verified only" />
-          <Select defaultValue="Featured" size="small" sx={{ height: '32px', minWidth: '120px' }}>
+          <FormControlLabel
+            control={
+              <Checkbox
+                size="small"
+                checked={verifiedOnly}
+                onChange={(e) => onVerifiedChange?.(e.target.checked)}
+              />
+            }
+            label="Verified only"
+          />
+          <Select
+            value={sortOption}
+            onChange={(e) => onSortChange?.(e.target.value)}
+            size="small"
+            sx={{ height: '32px', minWidth: '120px' }}
+          >
             <MenuItem value="Featured">Featured</MenuItem>
             <MenuItem value="Newest">Newest items</MenuItem>
           </Select>
           <Stack direction="row" sx={{ border: '1px solid', borderColor: 'divider', borderRadius: '4px', overflow: 'hidden' }}>
-            <IconButton size="small" sx={{ borderRadius: 0, borderRight: '1px solid', borderColor: 'divider' }}>
+            <IconButton
+              size="small"
+              onClick={() => onViewModeChange?.('grid')}
+              sx={{
+                borderRadius: 0,
+                borderRight: '1px solid',
+                borderColor: 'divider',
+                bgcolor: viewMode === 'grid' ? 'action.selected' : 'transparent',
+              }}
+              aria-pressed={viewMode === 'grid'}
+            >
               <GridViewIcon fontSize="small" />
             </IconButton>
-            <IconButton size="small" sx={{ borderRadius: 0, bgcolor: 'action.selected' }}>
+            <IconButton
+              size="small"
+              onClick={() => onViewModeChange?.('list')}
+              sx={{ borderRadius: 0, bgcolor: viewMode === 'list' ? 'action.selected' : 'transparent' }}
+              aria-pressed={viewMode === 'list'}
+            >
               <ViewListIcon fontSize="small" />
             </IconButton>
           </Stack>
@@ -62,17 +104,37 @@ const ProductListHeader = ({ activeFilters, onFilterToggle }) => {
           >
             Filter
           </Button>
-          <Select defaultValue="Featured" size="small" sx={{ height: '32px', minWidth: '110px', fontWeight: 400 }}>
+          <Select
+            value={sortOption}
+            onChange={(e) => onSortChange?.(e.target.value)}
+            size="small"
+            sx={{ height: '32px', minWidth: '110px', fontWeight: 400 }}
+          >
             <MenuItem value="Featured">Featured</MenuItem>
             <MenuItem value="Newest">Newest items</MenuItem>
           </Select>
         </Stack>
         
         <Stack direction="row" sx={{ border: '1px solid', borderColor: 'divider', borderRadius: '4px' }}>
-          <IconButton size="small" sx={{ borderRadius: 0, borderRight: '1px solid', borderColor: 'divider' }}>
+          <IconButton
+            size="small"
+            onClick={() => onViewModeChange?.('grid')}
+            sx={{
+              borderRadius: 0,
+              borderRight: '1px solid',
+              borderColor: 'divider',
+              bgcolor: viewMode === 'grid' ? 'action.selected' : 'transparent',
+            }}
+            aria-pressed={viewMode === 'grid'}
+          >
             <GridViewIcon fontSize="small" />
           </IconButton>
-          <IconButton size="small" sx={{ borderRadius: 0, bgcolor: 'action.selected' }}>
+          <IconButton
+            size="small"
+            onClick={() => onViewModeChange?.('list')}
+            sx={{ borderRadius: 0, bgcolor: viewMode === 'list' ? 'action.selected' : 'transparent' }}
+            aria-pressed={viewMode === 'list'}
+          >
             <ViewListIcon fontSize="small" />
           </IconButton>
         </Stack>
