@@ -3,7 +3,7 @@
 import React, { createContext, useState, useMemo, useContext } from "react";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
-import { getThemeOptions } from "@/src/app/components/theme/index"; // Import your helper
+import { getThemeOptions } from "@/src/app/components/theme/index";
 
 export const ColorModeContext = createContext({ toggleColorMode: () => {} });
 
@@ -14,7 +14,6 @@ export const CustomThemeProvider = ({ children }) => {
     toggleColorMode: () => setMode((prev) => (prev === "light" ? "dark" : "light")),
   }), []);
 
-  // Use your actual theme options from the other files
   const theme = useMemo(() => createTheme(getThemeOptions(mode)), [mode]);
 
   return (

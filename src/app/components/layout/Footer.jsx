@@ -22,6 +22,7 @@ const footerLinks = [
 const Footer = () => {
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
+  const currentYear = new Date().getFullYear();
 
   const appButtonStyle = {
     display: 'flex',
@@ -134,7 +135,6 @@ const Footer = () => {
         </Box>
       </Container>
 
-      {/* COPYRIGHT BOTTOM BAR */}
       <Box sx={{ bgcolor: isDark ? 'rgba(255,255,255,0.05)' : '#EFF2F4', py: 2.5, width: '100%' }}>
         <Container 
           maxWidth="false"
@@ -150,12 +150,12 @@ const Footer = () => {
           }}
         >
           <Typography variant="body2" sx={{ color: '#606060' }}>
-            © 2023 Ecommerce.
+            © {currentYear} Ecommerce.
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, cursor: 'pointer' }}>
             <Box component="img" src="/images/homepage/regions/us.png" sx={{ width: 22, height: 15, borderRadius: '2px' }} />
             <Typography sx={{ color: '#606060', fontSize: '14px', display: 'flex', alignItems: 'center' }}>
-              English <KeyboardArrowUpIcon fontSize="small" sx={{ ml: 0.5 }} />
+              English, USD <KeyboardArrowUpIcon fontSize="small" sx={{ ml: 0.5 }} />
             </Typography>
           </Box>
         </Container>

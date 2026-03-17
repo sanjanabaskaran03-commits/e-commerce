@@ -1,7 +1,6 @@
 import mongoose from 'mongoose';
 
 const CartItemSchema = new mongoose.Schema({
-  // This "ref" links the item directly to your Product model
   productId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Product', 
@@ -16,13 +15,12 @@ const CartItemSchema = new mongoose.Schema({
 });
 
 const CartSchema = new mongoose.Schema({
-  // In a real app, this links to the logged-in User
   userId: {
-    type: String, // Or mongoose.Schema.Types.ObjectId if you have a User model
+    type: String, 
     required: true,
-    unique: true // One cart per user
+    unique: true 
   },
-  items: [CartItemSchema], // Array of products
+  items: [CartItemSchema], 
   active: {
     type: Boolean,
     default: true

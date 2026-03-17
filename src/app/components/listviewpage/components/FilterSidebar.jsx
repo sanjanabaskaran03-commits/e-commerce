@@ -139,7 +139,6 @@ const FilterSidebar = ({
 
         <Divider sx={{ my: 1 }} />
 
-        {/* Brands Section */}
         <FilterSection 
           title="Brands" 
           hasMore={dynamicBrands.length > 4} 
@@ -159,7 +158,6 @@ const FilterSidebar = ({
 
         <Divider sx={{ my: 1 }} />
 
-        {/* Features Section */}
         <FilterSection 
           title="Features" 
           hasMore={features.length > 4} 
@@ -179,7 +177,6 @@ const FilterSidebar = ({
 
         <Divider sx={{ my: 1 }} />
 
-        {/* Price range */}
         <FilterSection title="Price range">
           <Stack spacing={2} sx={{ px: 1, mt: 1 }}>
             <Slider
@@ -212,7 +209,6 @@ const FilterSidebar = ({
 
         <Divider sx={{ my: 1 }} />
 
-        {/* Ratings Section */}
         <FilterSection title="Ratings">
           <Stack spacing={0.5}>
             {[5, 4, 3, 2].map((stars) => (

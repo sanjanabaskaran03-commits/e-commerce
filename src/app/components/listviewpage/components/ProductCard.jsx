@@ -16,7 +16,7 @@ const MotionCard = motion.create(Card);
 const ProductCard = ({ product, viewMode = 'list', isFirst = false }) => {
   const { addToCart } = useCart();
   const router = useRouter();
-  const { toggleWishlist, isInWishlist } = useWishlist(); // Use global context
+  const { toggleWishlist, isInWishlist } = useWishlist(); 
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [animate, setAnimate] = useState(false);
   const theme = useTheme();

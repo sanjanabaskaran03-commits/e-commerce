@@ -5,7 +5,6 @@ import { Box, Typography } from '@mui/material';
 import { useRouter, useSearchParams } from 'next/navigation'; 
 import ProductCard from '@/src/app/components/listviewpage/components/ProductCard';
 
-// Image Imports
 import Iphone from '@/public/images/listviewpage/mobiles/mobile.png'
 import Samsung from '@/public/images/listviewpage/mobiles/mobile2.png'
 import Xiaomi from '@/public/images/listviewpage/mobiles/mobile3.png'

@@ -204,7 +204,8 @@ const HeroSection = () => {
                   height: "100%",
                   display: "flex",
                   flexDirection: "column",
-                  justifyContent: "center",
+                  justifyContent: { xs: "flex-start", md: "center" },
+                  pt: { xs: 4, md: 4 },
                 }}
               >
                 <Typography
