@@ -2,6 +2,7 @@
 
 import React, { useContext, useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useWishlist } from '@/src/app/context/WishlistContext';
 import { ColorModeContext } from '../../context/ThemeContext';
@@ -35,6 +36,14 @@ const BrandHeader = () => {
     () => [...new Set(sampleData.map(item => item.category))],
     []
   );
+  const categoryCards = useMemo(() => {
+    return productCategories
+      .map((category) => {
+        const product = sampleData.find(item => item.category === category);
+        return product ? { category, product } : null;
+      })
+      .filter(Boolean);
+  }, [productCategories]);
   const searchSuggestions = useMemo(() => {
     const titles = sampleData.map(item => item.title);
     return [...new Set(titles)];
@@ -251,6 +260,63 @@ const BrandHeader = () => {
                   >
                     <Typography sx={{ fontSize: '0.9rem', color: 'text.primary' }}>
                       {item}
+                    </Typography>
+                  </Box>
+                ))}
+              </Box>
+            )}
+
+            {showSuggestions && filteredSuggestions.length === 0 && searchCategory === 'All category' && !searchTerm.trim() && (
+              <Box
+                sx={{
+                  position: 'absolute',
+                  top: '46px',
+                  left: 0,
+                  right: 0,
+                  bgcolor: 'background.paper',
+                  border: '1px solid',
+                  borderColor: 'divider',
+                  borderRadius: '8px',
+                  boxShadow: 2,
+                  zIndex: 1200,
+                  p: 1,
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(2, 1fr)',
+                  gap: 1,
+                }}
+              >
+                {categoryCards.map(({ category, product }) => (
+                  <Box
+                    key={category}
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => {
+                      const slug = category.toLowerCase().replace(/\s+/g, '-');
+                      setShowSuggestions(false);
+                      router.push(`/shop?category=${slug}`);
+                    }}
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 1,
+                      p: 1,
+                      border: '1px solid',
+                      borderColor: 'divider',
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                      '&:hover': { bgcolor: 'action.hover' },
+                    }}
+                  >
+                    <Box sx={{ width: 36, height: 36, position: 'relative', flexShrink: 0 }}>
+                      <Image
+                        src={product.img}
+                        alt={product.title}
+                        fill
+                        sizes="36px"
+                        style={{ objectFit: 'contain' }}
+                      />
+                    </Box>
+                    <Typography sx={{ fontSize: '0.9rem', color: 'text.primary' }}>
+                      {category}
                     </Typography>
                   </Box>
                 ))}

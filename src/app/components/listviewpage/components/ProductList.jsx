@@ -208,13 +208,21 @@ const ProductList = ({
       {sortedProducts.length > 0 ? (
         <Box
           sx={{
-            display: isGrid ? 'grid' : 'block',
-            gridTemplateColumns: isGrid ? { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' } : 'none',
+            display: isGrid ? 'flex' : 'block',
+            flexWrap: isGrid ? 'wrap' : 'nowrap',
             gap: isGrid ? 2 : 0,
           }}
         >
           {sortedProducts.map(item => (
-            <Box key={item.id} onClick={() => router.push(`/detail/${item.id}`)} sx={{ cursor: 'pointer' }}>
+            <Box
+              key={item.id}
+              onClick={() => router.push(`/detail/${item.id}`)}
+              sx={{
+                cursor: 'pointer',
+                flex: isGrid ? { xs: '1 1 calc(50% - 16px)', sm: '1 1 calc(50% - 16px)', md: '1 1 calc(33.333% - 16px)' } : '1 1 auto',
+                maxWidth: isGrid ? { xs: 'calc(50% - 16px)', sm: 'calc(50% - 16px)', md: 'calc(33.333% - 16px)' } : '100%',
+              }}
+            >
               <ProductCard product={item} viewMode={viewMode} />
             </Box>
           ))}
