@@ -14,7 +14,7 @@ const RecommendedSection = ({ title, items }) => {
           mb: { xs: 2, md: 3 },
           color: 'text.primary',
           textAlign: 'left',
-          fontSize: { xs: '18px', md: '24px' } // Matched mobile header size
+          fontSize: { xs: '18px', md: '24px' } 
         }}
       >
         {title}
@@ -24,12 +24,12 @@ const RecommendedSection = ({ title, items }) => {
         sx={{
           display: 'grid',
           gridTemplateColumns: {
-            xs: 'repeat(2, 1fr)', // 2 columns on mobile
+            xs: 'repeat(2, 1fr)', 
             sm: 'repeat(3, 1fr)',
             md: 'repeat(4, 1fr)',
             lg: 'repeat(5, 1fr)'
           },
-          gap: { xs: 1, md: 2 }, // Tighter gap on mobile like the screenshot
+          gap: { xs: 1, md: 2 }, 
           width: '100%'
         }}
       >

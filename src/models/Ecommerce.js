@@ -7,6 +7,8 @@ const EcommerceSchema = new mongoose.Schema({
   category: { type: String },
   isRecommended: Boolean,
   image: { type: String },
+  sectionTags: [{ type: String }],
+  discountPercent: { type: Number },
   rating: {
     rate: Number,
     count: Number

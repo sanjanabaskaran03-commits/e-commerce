@@ -11,14 +11,12 @@ const RecommendedCard = ({ img, price, description }) => {
 
   return (
     <MotionPaper
-      // ANIMATION SETTINGS
       initial={{ opacity: 0, scale: 0.9, y: 30 }}
       whileInView={{ opacity: 1, scale: 1, y: 0 }}
-      // FIX: Changed once to false so it animates every time you scroll
       viewport={{ once: false, amount: 0.2 }} 
       transition={{ 
         duration: 0.2, 
-        ease: [0.215, 0.61, 0.355, 1] // Smooth cubic-bezier for a premium feel
+        ease: [0.215, 0.61, 0.355, 1]
       }}
       whileHover={{ y: -8, transition: { duration: 0.2 } }}
       
@@ -32,7 +30,7 @@ const RecommendedCard = ({ img, price, description }) => {
         bgcolor: 'background.paper',
         transition: '0.3s',
         cursor: 'pointer',
-        borderColor: '#DEE2E7',
+        border: 'none',
         '&:hover': {
           boxShadow: theme.shadows[4],
           borderColor: '#8a8888'
@@ -61,7 +59,7 @@ const RecommendedCard = ({ img, price, description }) => {
           }}
         />
         <Image
-            src={img?.src || img} // Handles both static imports and string paths
+            src={img?.src || img} 
             alt={description}
             fill
             sizes="(max-width: 768px) 140px, 180px"

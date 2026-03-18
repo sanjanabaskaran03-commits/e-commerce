@@ -6,11 +6,6 @@ import { motion } from "framer-motion";
 import LayoutContainer from "@/src/app/components/common/LayoutContainer";
 import Image from "next/image";
 
-import Smartwatch from "@/public/images/homepage/deals/watch.png";
-import Laptop from "@/public/images/homepage/deals/laptop.png";
-import Camera from "@/public/images/homepage/deals/camera.png";
-import Headphone from "@/public/images/homepage/deals/headphone.png";
-import Phone from "@/public/images/homepage/deals/phone.png";
 
 const MotionBox = motion(Box);
 
@@ -45,13 +40,24 @@ const Deals = () => {
     return () => clearInterval(timer);
   }, []);
 
-  const deals = [
-    { name: "Smart watches", discount: "-25%", img: Smartwatch },
-    { name: "Laptops", discount: "-15%", img: Laptop },
-    { name: "Canon cameras", discount: "-25%", img: Camera },
-    { name: "Headphones", discount: "-25%", img: Headphone },
-    { name: "GoPro cameras", discount: "-40%", img: Phone },
-  ];
+  const [deals, setDeals] = useState([]);
+
+  useEffect(() => {
+    let isMounted = true;
+    const loadDeals = async () => {
+      try {
+        const res = await fetch('/api/ecommerce?tag=deals');
+        const data = await res.json();
+        if (isMounted) setDeals(Array.isArray(data) ? data : []);
+      } catch (err) {
+        if (isMounted) setDeals([]);
+      }
+    };
+    loadDeals();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   return (
     <LayoutContainer>
@@ -108,7 +114,7 @@ const Deals = () => {
         >
           {deals.map((item, index) => (
             <MotionBox
-              key={index}
+              key={item._id || index}
               initial={{ opacity: 0, y: 10 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -138,9 +144,10 @@ const Deals = () => {
               >
                 <Box sx={{ position: "relative", height: { xs: 100, md: 120 }, width: 120, mb: 2 }}>
                   <Image
-                    src={item.img}
-                    alt={item.name}
+                    src={item.image}
+                    alt={item.title}
                     fill
+                    sizes="120px"
                     style={{ objectFit: "contain" }}
                   />
                 </Box>
@@ -155,7 +162,7 @@ const Deals = () => {
                   textAlign: "center",
                 }}
               >
-                {item.name}
+                {item.title}
               </Typography>
 
               <Box
@@ -169,7 +176,7 @@ const Deals = () => {
                   fontWeight: 600,
                 }}
               >
-                {item.discount}
+                {item.discountPercent ? `-${item.discountPercent}%` : "Deal"}
               </Box>
             </MotionBox>
           ))}

@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "seed:products": "node scripts/seed-products.js"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -18,7 +19,8 @@
     "mongoose": "^9.3.0",
     "next": "16.1.6",
     "react": "19.2.3",
-    "react-dom": "19.2.3"
+    "react-dom": "19.2.3",
+    "sharp": "^0.33.5"
   },
   "devDependencies": {
     "babel-plugin-react-compiler": "1.0.0",

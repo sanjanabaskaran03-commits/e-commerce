@@ -2,6 +2,7 @@
 import React from 'react';
 import { Box, Typography, Stack, useTheme } from '@mui/material';
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 
 const MotionBox = motion(Box);
 
@@ -24,10 +25,9 @@ const CategoryCard = ({ title, price, img }) => {
         alignItems: { xs: 'center', md: 'flex-start' , lg: 'flex-start' },
         height: '100%',
         minHeight: '127px',
-        // FIX: Use backticks (`) instead of single quotes (')
         borderRight: { 
-          xs: `1px solid ${theme.palette.divider}`, // Visible on mobile
-          md: `1px solid ${theme.palette.divider}`  // Visible on desktop
+          xs: `1px solid ${theme.palette.divider}`,
+          md: `1px solid ${theme.palette.divider}`  
         },
         borderBottom: { 
           xs: `1px solid ${theme.palette.divider}`, 
@@ -36,7 +36,6 @@ const CategoryCard = ({ title, price, img }) => {
         '&:nth-of-type(4n)': {
       borderRight: { xs:'none',lg:'none',md: 'none' }
     },
-    // FIX: Remove bottom border on the last row
     '&:nth-of-type(n+5)': {
       borderBottom: { md: 'none' }
     },
@@ -48,20 +47,26 @@ const CategoryCard = ({ title, price, img }) => {
       }}
     >
       <Box
-        component={motion.img}
+        component={motion.div}
         whileHover={{ scale: 1.1, rotate: 2 }}
         transition={{ type: "spring", stiffness: 300 }}
-        src={img?.src || img}
-        alt={title}
         sx={{
           width: { xs: '70px', md: '80px' },
           height: { xs: '70px', md: '80px' },
-          objectFit: 'contain',
           alignSelf: { xs: 'center', md: 'flex-end' },
-          order: { xs: 1, md: 2 }, 
-          mb: { xs: 1, md: 0 }
+          order: { xs: 1, md: 2 },
+          mb: { xs: 1, md: 0 },
+          position: 'relative',
         }}
-      />
+      >
+        <Image
+          src={img?.src || img}
+          alt={title}
+          fill
+          sizes="80px"
+          style={{ objectFit: 'contain' }}
+        />
+      </Box>
 
       <Stack 
         spacing={0.5} 
