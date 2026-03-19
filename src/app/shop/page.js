@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, Suspense, useContext } from 'react'; // Added useContext
 import { useSearchParams } from 'next/navigation'; 
 import { Box, Chip, Stack, Button } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import { useTheme } from '@mui/material/styles'; // Added useTheme
 
 import BreadcrumbSection from "@/src/app/components/listviewpage/components/BreadCrumbSection";
 import FilterSidebar from '@/src/app/components/listviewpage/components/FilterSidebar';
@@ -19,9 +20,11 @@ const ListContent = () => {
   const [sortOption, setSortOption] = useState("Featured");
   const [viewMode, setViewMode] = useState("list");
   const [priceRange, setPriceRange] = useState([0, 5000]);
+  
+  const theme = useTheme();
+  const isDark = theme.palette.mode === 'dark';
   const searchParams = useSearchParams();
 
-  // 1. Extract the category from the URL (?category=mobile-accessory)
   const category = searchParams.get('category');
 
   const handleFilterToggle = (filterName) => {
@@ -50,7 +53,6 @@ const ListContent = () => {
           </Box>
 
           <Box sx={{ flexGrow: 1, width: "100%" }}>
-            {/* 2. PASS THE CATEGORY HERE */}
             <ProductListHeader 
               category={category} 
               activeFilters={activeFilters} 
@@ -72,14 +74,23 @@ const ListContent = () => {
                     key={filter}
                     label={filter}
                     onDelete={() => handleFilterToggle(filter)}
+                    // Removed hardcoded style from CloseIcon to let Chip control it
                     deleteIcon={<CloseIcon style={{ fontSize: '16px' }} />}
                     variant="outlined"
                     sx={{ 
                       borderRadius: '5px', 
-                      borderColor: '#0D6EFD', 
-                      color: '#465166',
-                      bgcolor: '#fff',
-                      '& .MuiChip-label': { px: 1 }
+                      // Theme-aware border color
+                      borderColor: isDark ? 'primary.light' : '#0D6EFD', 
+                      // Theme-aware text color
+                      color: 'text.primary',
+                      // Theme-aware background
+                      bgcolor: 'background.paper',
+                      '& .MuiChip-label': { px: 1 },
+                      '& .MuiChip-deleteIcon': {
+                        // This fixes your "invisible" close icon
+                        color: isDark ? theme.palette.primary.light : '#0D6EFD',
+                        '&:hover': { color: 'error.main' }
+                      }
                     }}
                   />
                 ))}
@@ -87,7 +98,13 @@ const ListContent = () => {
                 <Button 
                   variant="text" 
                   onClick={clearAllFilters}
-                  sx={{ textTransform: 'none', color: '#0D6EFD', fontSize: '14px', ml: 1 }}
+                  sx={{ 
+                    textTransform: 'none', 
+                    // Theme-aware button color
+                    color: isDark ? 'primary.light' : '#0D6EFD', 
+                    fontSize: '14px', 
+                    ml: 1 
+                  }}
                 >
                   Clear all filter
                 </Button>
@@ -95,7 +112,6 @@ const ListContent = () => {
             )}
 
             <Box sx={{ my: 2 }}>
-              {/* 3. Also pass category to ProductList so you can filter your API results */}
               <ProductList
                 category={category}
                 activeFilters={activeFilters}

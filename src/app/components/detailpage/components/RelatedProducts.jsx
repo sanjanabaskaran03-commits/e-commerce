@@ -18,12 +18,12 @@ const RelatedProducts = () => {
   const borderColor = theme.palette.divider;
 
   const productsArray = [
-    { id: 1, title: 'Wallet', price: '$32.00-$40.00', img: Wallet },
-    { id: 2, title: 'Smart watch', price: '$32.00-$40.00', img: Smartwatch },
-    { id: 3, title: 'Headphone', price: '$32.00-$40.00', img: Headphone },
+    { id: 1, title: 'Wallet', price: '$32.00-$60.00', img: Wallet },
+    { id: 2, title: 'Smart watch', price: '$20.00-$40.00', img: Smartwatch },
+    { id: 3, title: 'Headphone', price: '$40.00-$80.00', img: Headphone },
     { id: 4, title: 'Poco X5 Pro 5G', price: '$32.00-$40.00', img: Poco },
-    { id: 5, title: 'Canon Camera', price: '$32.00-$40.00', img: Canon },
-    { id: 6, title: "Huawei Watch ", price: '$32.00-$40.00', img: Watch }
+    { id: 5, title: 'Canon Camera', price: '$60.00-$70.00', img: Canon },
+    { id: 6, title: "Huawei Watch ", price: '$32.00-$42.00', img: Watch }
   ];
 
   return (

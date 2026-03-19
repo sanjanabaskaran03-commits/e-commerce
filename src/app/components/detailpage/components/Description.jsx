@@ -1,60 +1,66 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useTheme } from '@mui/material';
-import { useParams } from 'next/navigation'; // Added to get the ID
+import { useParams } from 'next/navigation';
 import {
   Box, Typography, Stack, Link, TableCell, TableBody, TableRow, TableContainer, Table
 } from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
 import LayoutContainer from '@/src/app/components/common/LayoutContainer';
 
-// Import your sampleData (Or paste the array from ProductList here)
-import { sampleData } from '@/src/app/components/listviewpage/components/ProductList'; 
-
 const Description = () => {
-  const { id } = useParams(); // Get ID from /detail/[id]
+  const { id } = useParams();
   const [activeTab, setActiveTab] = useState('Description');
   const theme = useTheme();
-const isDark = theme.palette.mode === 'dark';
+  const isDark = theme.palette.mode === 'dark';
 
-  // Find the current product based on the URL ID
-  const product = sampleData.find((p) => p.id === parseInt(id)) || sampleData[0];
+  const [product, setProduct] = useState(null);
+  const [relatedProducts, setRelatedProducts] = useState([]);
 
-  // Logic: "You may like" should show products from the SAME category, excluding current
-  const relatedProducts = sampleData
-    .filter((p) => p.category === product.category && p.id !== product.id)
-    .slice(0, 5); // Take up to 5 items
+  useEffect(() => {
+    const fetchProductDetails = async () => {
+      try {
+        const res = await fetch('/api/products');
+        const allData = await res.json();
+        
+        const current = allData.find((p) => p.id === Number(id)) || allData[0];
+        setProduct(current);
 
-  // Dynamic Specs based on product description/category
+        const related = allData
+          .filter((p) => p.category === current.category && p.id !== current.id)
+          .slice(0, 5);
+        setRelatedProducts(related);
+      } catch (err) {
+        console.error("Failed to fetch product for description", err);
+      }
+    };
+    fetchProductDetails();
+  }, [id]);
+
+  if (!product) return null;
+
   const specs = [
     { label: 'Model', value: `#${1000 + product.id}XT` },
-    { label: 'Category', value: product.category },
-    { label: 'Features', value: product.description.split(',')[0] }, // Grab first part of desc
-    { label: 'Rating', value: `${product.rating} Stars` },
-    { label: 'Availability', value: 'In Stock' },
+    { label: 'Style', value: 'Classic style' },
+    { label: 'Certificate', value: 'ISO-898921212' },
+    { label: 'Size', value: '34mm x 450mm x 19mm' },
+    { label: 'Memory', value: '36GB RAM' },
   ];
 
   return (
     <LayoutContainer>
       <Stack
-        direction={{ md: 'row' }}
+        direction="row"
         spacing={2}
         justifyContent="space-between"
         alignItems="flex-start"
-        sx={{ mt: 3, display: { xs: 'none', md: "flex" } }}
+        sx={{ mt: 3 }}
       >
-        <Stack sx={{ flex: 3 }}>
-          <Box
-            sx={{
-              border: '1px solid',
-              borderColor: 'divider',
-              borderRadius: '6px',
-              overflow: 'hidden',
-              bgcolor: 'background.paper',
-            }}
-          >
+        {/* Main Content (Left) */}
+        <Stack sx={{ flex: 3, width: '100%' }}>
+          <Box sx={{ border: '1px solid', borderColor: 'divider', borderRadius: '6px', overflow: 'hidden', bgcolor: 'background.paper' }}>
             <Box sx={{ borderBottom: '1px solid', borderColor: 'divider', px: 3 }}>
               <Stack direction="row" spacing={3}>
                 {['Description', 'Reviews', 'Shipping', 'About seller'].map((tab) => (
@@ -70,7 +76,6 @@ const isDark = theme.palette.mode === 'dark';
                       color: activeTab === tab ? 'primary.main' : '#8B96A5',
                       borderBottom: activeTab === tab ? '2px solid' : 'none',
                       borderColor: 'primary.main',
-                      '&:hover': { color: 'primary.main' },
                     }}
                   >
                     {tab}
@@ -80,36 +85,20 @@ const isDark = theme.palette.mode === 'dark';
             </Box>
 
             <Box sx={{ p: 3 }}>
-              {/* DYNAMIC CONTENT */}
-              <Typography variant="h6" sx={{ mb: 1, fontWeight: 600 }}>
-                Detailed Information: {product.title}
-              </Typography>
-              <Typography variant="body1" sx={{ color: 'text.secondary', mb: 3, lineHeight: 1.6 }}>
-                The {product.title} is designed for users looking for {product.description}. 
-                Experience the best in the {product.category} category with high-quality materials 
-                and industry-leading performance.
+              <Typography variant="body1" sx={{ color: 'text.primary', mb: 3, lineHeight: 1.6 }}>
+                Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et 
+                dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea 
+                commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat 
+                nulla pariatur.
               </Typography>
 
-              <TableContainer
-                component={Box}
-                sx={{
-                  maxWidth: 450,
-                  mb: 3,
-                  border: '1px solid',
-                  borderColor: '#E0E7EE',
-                  borderRadius: '4px',
-                }}
-              >
+              <TableContainer component={Box} sx={{ maxWidth: 450, mb: 3, border: '1px solid', borderColor: '#E0E7EE', borderRadius: '4px' }}>
                 <Table size="small">
                   <TableBody>
-                    {specs.map((row, index) => (
+                    {specs.map((row) => (
                       <TableRow key={row.label}>
-                        <TableCell sx={{ bgcolor: isDark ? '#505050' : '#eff2f4', width: 150, fontWeight: 500 }}>
-                          {row.label}
-                        </TableCell>
-                        <TableCell sx={{ color: 'text.secondary' }}>
-                          {row.value}
-                        </TableCell>
+                        <TableCell sx={{ bgcolor: isDark ? '#404040' : '#eff2f4', width: 150, fontWeight: 500, color: 'text.secondary' }}>{row.label}</TableCell>
+                        <TableCell sx={{ color: 'text.secondary' }}>{row.value}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -117,13 +106,7 @@ const isDark = theme.palette.mode === 'dark';
               </TableContainer>
 
               <Stack spacing={1}>
-                <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>Key Highlights:</Typography>
-                {[
-                  `Premium ${product.category} quality`,
-                  `Highly rated: ${product.rating}/5 by users`,
-                  `Official warranty included`,
-                  `Fast shipping on all orders`
-                ].map((text, i) => (
+                {['Some great feature name here', 'Lorem ipsum dolor sit amet, consectetur', 'Duis aute irure dolor in reprehenderit', 'Some great feature name here'].map((text, i) => (
                   <Stack key={i} direction="row" spacing={1} alignItems="center">
                     <CheckIcon sx={{ fontSize: 18, color: '#8B96A5' }} />
                     <Typography variant="body2" sx={{ color: 'text.secondary' }}>{text}</Typography>
@@ -134,33 +117,76 @@ const isDark = theme.palette.mode === 'dark';
           </Box>
         </Stack>
 
-        {/* RELATED PRODUCTS SIDEBAR */}
-        <Stack sx={{ flex: 1, minWidth: 280 }}>
-          <Box sx={{
-            bgcolor: 'background.paper',
-            borderRadius: '6px',
-            border: '1px solid',
-            borderColor: 'divider',
-            p: 2,
-          }}>
-            <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2 }}>
-              More from {product.category}
-            </Typography>
-            <Stack spacing={2.5}>
-              {relatedProducts.map((item) => (
-                <Stack key={item.id} direction="row" spacing={2} alignItems="center">
-                  <Box sx={{ position: 'relative', width: 50, height: 50, border: '1px solid #eee', p: 0.5 }}>
-                    <Image src={item.img} fill style={{ objectFit: 'contain' }} alt={item.title} />
-                  </Box>
-                  <Box>
-                    <Typography sx={{ fontSize: "14px", fontWeight: 500 }}>{item.title}</Typography>
-                    <Typography sx={{ color: '#8B96A5', fontSize: "13px" }}>${item.price}</Typography>
-                  </Box>
-                </Stack>
-              ))}
-            </Stack>
-          </Box>
-        </Stack>
+       {/* Sidebar (Right) - Exact Match to Image */}
+<Stack 
+  sx={{ 
+    flex: 1, 
+    minWidth: 280, 
+    display: { xs: 'none', md: 'flex' } 
+  }}
+>
+  <Box sx={{
+    bgcolor: 'background.paper',
+    borderRadius: '6px',
+    border: '1px solid',
+    borderColor: 'divider',
+    p: 2,
+  }}>
+    <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2 }}>
+      You may like
+    </Typography>
+    
+    <Stack spacing={2}>
+      {/* If relatedProducts is empty, it will show nothing. 
+          Ensure your /api/products returns data correctly. */}
+      {relatedProducts.length > 0 ? (
+        relatedProducts.map((item) => (
+          <Stack key={item.id} direction="row" spacing={2} alignItems="center">
+            <Box sx={{ 
+              position: 'relative', 
+              width: 80, // Slightly wider to match image proportions
+              height: 80, 
+              border: '1px solid #E0E7EE', 
+              borderRadius: '6px', 
+              p: 1,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0
+            }}>
+              <Image 
+                src={item.img} 
+                width={60} 
+                height={60} 
+                style={{ objectFit: 'contain' }} 
+                alt={item.title} 
+              />
+            </Box>
+            <Box sx={{ textAlign: 'left' }}>
+              <Typography sx={{ 
+                fontSize: "14px", 
+                fontWeight: 400, 
+                color: '#1C1C1C', 
+                lineHeight: 1.3,
+                mb: 0.5
+              }}>
+                {item.title}
+              </Typography>
+              <Typography sx={{ color: '#8B96A5', fontSize: "13px" }}>
+                $7.00 - $99.50
+              </Typography>
+            </Box>
+          </Stack>
+        ))
+      ) : (
+        /* Fallback if no related products found in database */
+        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+          No similar items found.
+        </Typography>
+      )}
+    </Stack>
+  </Box>
+</Stack>
       </Stack>
     </LayoutContainer>
   );

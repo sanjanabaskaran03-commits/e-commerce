@@ -8,7 +8,7 @@ import {
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { sampleData } from './ProductList'; 
+import { useTheme } from '@mui/material/styles';
 
 const FilterSection = ({ title, children, onSeeAll, hasMore = false, seeAllText = "See all" }) => (
   <Accordion defaultExpanded elevation={0} sx={{ '&:before': { display: 'none' }, bgcolor: 'transparent' }}>
@@ -38,17 +38,45 @@ const FilterSidebar = ({
   priceRange = [0, 1000],
   onPriceChange,
 }) => {
+  const theme = useTheme();
+  const isDark = theme.palette.mode === 'dark';
+
   const [expandedSections, setExpandedSections] = useState({});
   const [draftPrice, setDraftPrice] = useState(priceRange);
+  const [allCategories, setAllCategories] = useState([]);
+  const [dynamicBrands, setDynamicBrands] = useState([]);
 
-  useEffect(() => {
-    setDraftPrice(priceRange);
-  }, [priceRange]);
   const searchParams = useSearchParams();
   const router = useRouter(); 
   
   const currentCategory = searchParams.get('category')?.replace(/-/g, ' ');
   const isChecked = (value) => activeFilters.includes(value);
+
+  useEffect(() => {
+    const fetchFilters = async () => {
+      try {
+        const res = await fetch('/api/products');
+        const data = await res.json();
+        if (Array.isArray(data)) {
+          const cats = [...new Set(data.map(item => item.category))];
+          setAllCategories(cats);
+
+          const relevant = currentCategory 
+            ? data.filter(p => p.category.toLowerCase() === currentCategory.toLowerCase())
+            : data;
+          const brands = [...new Set(relevant.map(item => item.title.split(' ')[0]))];
+          setDynamicBrands(brands);
+        }
+      } catch (error) {
+        console.error("Filter fetch error:", error);
+      }
+    };
+    fetchFilters();
+  }, [currentCategory]);
+
+  useEffect(() => {
+    setDraftPrice(priceRange);
+  }, [priceRange]);
 
   const handleToggleSeeAll = (section) => {
     setExpandedSections(prev => ({ ...prev, [section]: !prev[section] }));
@@ -62,13 +90,6 @@ const FilterSidebar = ({
     const urlFriendly = category.toLowerCase().replace(/\s+/g, '-');
     router.push(`/shop?category=${urlFriendly}`);
   };
-
-  const allCategories = [...new Set(sampleData.map(item => item.category))];
-  const relevantProducts = currentCategory 
-    ? sampleData.filter(p => p.category.toLowerCase() === currentCategory.toLowerCase())
-    : sampleData;
-  
-  const dynamicBrands = [...new Set(relevantProducts.map(item => item.title.split(' ')[0]))];
 
   const getFeatures = () => {
     const cat = (currentCategory || "").toLowerCase();
@@ -86,14 +107,14 @@ const FilterSidebar = ({
       return ['Leather', 'Metallic', 'Waterproof', 'Wireless', 'Noise Cancelling', 'Modern tech'];
     }
     if (cat.includes('sports') || cat.includes('outdoor')) {
-    return ['Waterproof', 'Lightweight', 'Metallic', 'Heavy Duty', 'Portable'];
-  }
-  if (cat.includes('animal') || cat.includes('pets')) {
-    return ['Soft', 'Leather', 'Modern tech', 'Professional', 'Luxury'];
-  }
-  if (cat.includes('machinery')) {
-    return ['Steel', 'Heavy Duty', 'Professional', 'Electric', 'Manual'];
-  }
+      return ['Waterproof', 'Lightweight', 'Metallic', 'Heavy Duty', 'Portable'];
+    }
+    if (cat.includes('animal') || cat.includes('pets')) {
+      return ['Soft', 'Leather', 'Modern tech', 'Professional', 'Luxury'];
+    }
+    if (cat.includes('machinery')) {
+      return ['Steel', 'Heavy Duty', 'Professional', 'Electric', 'Manual'];
+    }
 
     return ['Quality Material', 'New Arrival', 'Best Seller', 'Metallic', 'Plastic cover'];
   };
@@ -139,6 +160,7 @@ const FilterSidebar = ({
 
         <Divider sx={{ my: 1 }} />
 
+        {/* Brands Section */}
         <FilterSection 
           title="Brands" 
           hasMore={dynamicBrands.length > 4} 
@@ -158,6 +180,7 @@ const FilterSidebar = ({
 
         <Divider sx={{ my: 1 }} />
 
+        {/* Features Section */}
         <FilterSection 
           title="Features" 
           hasMore={features.length > 4} 
@@ -177,6 +200,7 @@ const FilterSidebar = ({
 
         <Divider sx={{ my: 1 }} />
 
+        {/* Price range Section */}
         <FilterSection title="Price range">
           <Stack spacing={2} sx={{ px: 1, mt: 1 }}>
             <Slider
@@ -209,13 +233,14 @@ const FilterSidebar = ({
 
         <Divider sx={{ my: 1 }} />
 
+        {/* Ratings Section */}
         <FilterSection title="Ratings">
           <Stack spacing={0.5}>
             {[5, 4, 3, 2].map((stars) => (
               <FormControlLabel 
                 key={stars}
                 control={<Checkbox size="small" checked={isChecked(`${stars} star`)} onChange={() => onFilterToggle(`${stars} star`)} />} 
-                label={<Rating value={stars} readOnly size="small" sx={{ color: '#FF9017' }} />} 
+                label={<Rating value={stars} readOnly size="small" sx={{ color: isDark ? '#ffb347' : '#FF9017' }} />} 
               />
             ))}
           </Stack>
