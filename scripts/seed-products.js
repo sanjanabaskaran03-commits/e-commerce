@@ -1,6 +1,25 @@
+require('dotenv').config({ path: '.env.local' }); // Use the path to your specific env file
 const mongoose = require('mongoose');
+const fs = require('fs');
+const path = require('path');
 
-const MONGODB_URI = process.env.MONGODB_URI;
+const readEnvLocal = () => {
+  try {
+    const envPath = path.join(__dirname, '..', '.env.local');
+    if (!fs.existsSync(envPath)) return null;
+    const content = fs.readFileSync(envPath, 'utf8');
+    const line = content.split(/\r?\n/).find((l) => l.startsWith('MONGODB_URI='));
+    if (!line) return null;
+    return line.split('=', 2)[1].trim();
+  } catch {
+    return null;
+  }
+};
+
+let MONGODB_URI = process.env.MONGODB_URI || readEnvLocal();
+if (MONGODB_URI && ((MONGODB_URI.startsWith('"') && MONGODB_URI.endsWith('"')) || (MONGODB_URI.startsWith("'") && MONGODB_URI.endsWith("'")))) {
+  MONGODB_URI = MONGODB_URI.slice(1, -1);
+}
 
 if (!MONGODB_URI) {
   console.error('Missing MONGODB_URI. Set it in your shell before running this script.');
@@ -227,90 +246,90 @@ const products = [
 
   // Recommended items (old list)
   {
-    title: 'T-shirts with multiple colors, for men',
+    title: 'Men\u2019s Polo Shirt',
     price: 10.3,
-    description: 'T-shirts with multiple colors, for men',
+    description: 'Men\u2019s Polo Shirt',
     category: 'Recommended',
     image: '/images/homepage/recommended_items/tshirt.png',
     rating: { rate: 4.2, count: 55 },
     sectionTags: ['recommended'],
   },
   {
-    title: 'Jeans shorts for men blue color',
+    title: 'Men\u2019s Hooded Jacket',
     price: 10.3,
-    description: 'Jeans shorts for men blue color',
+    description: 'Men\u2019s Hooded Jacket',
     category: 'Recommended',
     image: '/images/homepage/recommended_items/jerkin.png',
     rating: { rate: 4.1, count: 48 },
     sectionTags: ['recommended'],
   },
   {
-    title: 'Brown winter coat medium size',
+    title: 'Men\u2019s Blazer',
     price: 12.5,
-    description: 'Brown winter coat medium size',
+    description: 'Men\u2019s Blazer',
     category: 'Recommended',
     image: '/images/homepage/recommended_items/blazer.png',
     rating: { rate: 4.3, count: 30 },
     sectionTags: ['recommended'],
   },
   {
-    title: 'Jeans bag for travel for men',
+    title: 'Blue Leather Wallet',
     price: 34,
-    description: 'Jeans bag for travel for men',
+    description: 'Blue Leather Wallet',
     category: 'Recommended',
     image: '/images/homepage/recommended_items/wallet.png',
     rating: { rate: 4.0, count: 60 },
     sectionTags: ['recommended'],
   },
   {
-    title: 'Leather wallet',
+    title: 'Blue Backpack',
     price: 99,
-    description: 'Leather wallet',
+    description: 'Blue Backpack',
     category: 'Recommended',
     image: '/images/homepage/recommended_items/bag.png',
     rating: { rate: 4.4, count: 40 },
     sectionTags: ['recommended'],
   },
   {
-    title: 'Canon camera black, 100x zoom',
+    title: 'Denim Shorts',
     price: 9.99,
-    description: 'Canon camera black, 100x zoom',
+    description: 'Denim Shorts',
     category: 'Recommended',
     image: '/images/homepage/recommended_items/cloth.png',
     rating: { rate: 4.1, count: 33 },
     sectionTags: ['recommended'],
   },
   {
-    title: 'Headset for gaming with mic',
+    title: 'Over-ear Headphones',
     price: 8.99,
-    description: 'Headset for gaming with mic',
+    description: 'Over-ear Headphones',
     category: 'Recommended',
     image: '/images/homepage/recommended_items/headphone.png',
     rating: { rate: 4.2, count: 72 },
     sectionTags: ['recommended'],
   },
   {
-    title: 'Smartwatch silver color modern',
+    title: 'Blue Backpack',
     price: 10.3,
-    description: 'Smartwatch silver color modern',
+    description: 'Blue Backpack',
     category: 'Recommended',
     image: '/images/homepage/recommended_items/bag.png',
     rating: { rate: 4.3, count: 26 },
     sectionTags: ['recommended'],
   },
   {
-    title: 'Blue wallet for men leather material',
+    title: 'Clay Pot',
     price: 10.3,
-    description: 'Blue wallet for men leather material',
+    description: 'Clay Pot',
     category: 'Recommended',
     image: '/images/homepage/recommended_items/pot.png',
     rating: { rate: 4.0, count: 22 },
     sectionTags: ['recommended'],
   },
   {
-    title: 'Jeans bag for travel for men',
+    title: 'Electric Kettle',
     price: 80.95,
-    description: 'Jeans bag for travel for men',
+    description: 'Electric Kettle',
     category: 'Recommended',
     image: '/images/homepage/recommended_items/coffee maker.png',
     rating: { rate: 4.1, count: 18 },
@@ -319,7 +338,7 @@ const products = [
 ];
 
 async function run() {
-  await mongoose.connect(MONGODB_URI);
+  await mongoose.connect(process.env.MONGODB_URI);
 
   if (process.argv.includes('--reset')) {
     await Product.deleteMany({ sectionTags: { $exists: true } });

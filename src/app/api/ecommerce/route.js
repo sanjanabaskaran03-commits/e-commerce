@@ -2,24 +2,25 @@ import { NextResponse } from 'next/server';
 import dbConnect from '@/src/lib/mongodb';
 import Product from '@/src/models/Ecommerce';
 
+// ecommerce-route.js
 export async function GET(req) {
   await dbConnect();
   try {
     const { searchParams } = new URL(req.url);
     const tagParam = searchParams.get('tag');
-    const query = {};
+    
+    let query = {};
 
     if (tagParam) {
-      const tags = tagParam.split(',').map((t) => t.trim()).filter(Boolean);
-      if (tags.length > 0) {
-        query.sectionTags = { $in: tags };
-      }
+      const tags = tagParam.split(',').map(t => t.trim());
+      // $in looks for ANY of the tags provided within the document's sectionTags array
+      query.sectionTags = { $in: tags }; 
     }
 
-    const products = await Product.find(query);
+    const products = await Product.find(query).lean(); // .lean() makes it faster for GET
     return NextResponse.json(products);
   } catch (error) {
-    return NextResponse.json({ error: "Failed to fetch products" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to fetch" }, { status: 500 });
   }
 }
 
