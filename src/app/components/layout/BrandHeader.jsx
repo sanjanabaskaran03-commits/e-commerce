@@ -8,8 +8,8 @@ import { useWishlist } from '@/src/app/context/WishlistContext';
 import { ColorModeContext } from '../../context/ThemeContext';
 import { useCart } from '../../context/CartContext';
 import {
-  AppBar, Toolbar, Typography, Box, IconButton, InputBase,
-  Button, Stack, MenuItem, Select, Container, Badge, Drawer, List, ListItem, Menu
+  useTheme,AppBar, Toolbar, Typography, Box, IconButton, InputBase,
+  Button, Stack, MenuItem, Select, Container, Badge, Drawer, List, ListItem, Menu, Divider
 } from '@mui/material';
 import {
   Person, Chat, Favorite, ShoppingCart,
@@ -17,6 +17,7 @@ import {
 } from '@mui/icons-material';
 
 const BrandHeader = () => {
+  const theme = useTheme();
   const [mounted, setMounted] = useState(false);
   const themeMode = useContext(ColorModeContext);
   const { cartItems } = useCart();
@@ -29,9 +30,9 @@ const BrandHeader = () => {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [activeSuggestion, setActiveSuggestion] = useState(-1);
   const [profileAnchorEl, setProfileAnchorEl] = useState(null);
-  const isDark = themeMode.mode === 'dark';
+  const isDark = theme.palette.mode === 'dark';
 
-  // --- NEW: MongoDB Data States ---
+  // --- MongoDB Data States ---
   const [dbProducts, setDbProducts] = useState([]);
   const [productCategories, setProductCategories] = useState([]);
 
@@ -44,22 +45,16 @@ const BrandHeader = () => {
       try {
         const res = await fetch('/api/products');
         const data = await res.json();
-        
         const productsArray = Array.isArray(data) ? data : (data.products || []);
-        
         setDbProducts(productsArray);
-        
         const uniqueCats = [...new Set(productsArray.map(item => item.category))];
         setProductCategories(uniqueCats);
       } catch (err) {
-        console.error("Failed to fetch header data from MongoDB", err);
+        console.error("Failed to fetch header data", err);
         setDbProducts([]); 
       }
     };
-    
-    if (mounted) {
-      fetchHeaderData();
-    }
+    if (mounted) fetchHeaderData();
   }, [mounted]);
 
   const cartCount = cartItems.reduce((acc, item) => acc + item.qty, 0);
@@ -101,10 +96,6 @@ const BrandHeader = () => {
     setSearchCategory(toCategoryLabel(category));
   }, [searchParams, productCategories]);
 
-  useEffect(() => {
-    setActiveSuggestion(-1);
-  }, [searchTerm]);
-
   const handleSearch = () => {
     const params = new URLSearchParams();
     const trimmed = searchTerm.trim();
@@ -123,10 +114,7 @@ const BrandHeader = () => {
     if (path) router.push(path);
   };
 
-  // HYDRATION FIX: Conditional return happens AFTER all hooks are declared
-  if (!mounted) {
-    return <Box sx={{ height: '70px', bgcolor: 'background.paper' }} />; 
-  }
+  if (!mounted) return <Box sx={{ height: '70px', bgcolor: 'background.paper' }} />; 
 
   return (
     <AppBar 
@@ -149,18 +137,20 @@ const BrandHeader = () => {
               </Link>
             </Stack>
 
+            {/* Mobile Header Icons */}
             <Stack direction="row" alignItems="center" spacing={1} sx={{ display: { xs: 'flex', md: 'none' } }}>
               <HeaderAction icon={<Person />} label="Profile" mobileHideLabel onClick={handleProfileOpen} />
-              <HeaderAction icon={<Badge badgeContent={wishlistCount} color="error"><Favorite/></Badge>} />
+              <IconButton onClick={themeMode.toggleColorMode}>
+                {/* SUN for Dark Mode, MOON for Light Mode */}
+                {isDark ? <WbSunny sx={{ color: '#FFD700' }} /> : <DarkMode sx={{ color: '#4A5568' }} />}
+              </IconButton>
               <Link href="/cart" style={{ textDecoration: 'none' }}>
                 <HeaderAction icon={<Badge badgeContent={cartCount} color="error"><ShoppingCart /></Badge>} label="Cart" mobileHideLabel />
               </Link>
-              <IconButton onClick={themeMode.toggleColorMode}>
-                {isDark ? <WbSunny sx={{ color: '#FFD700' }} /> : <DarkMode />}
-              </IconButton>
             </Stack>
           </Stack>
 
+          {/* Search Bar Section */}
           <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', flex: 1, maxWidth: '660px', position: 'relative' }}>
             <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', height: '44px', border: '2px solid', borderColor: '#0D6EFD', borderRadius: '8px', overflow: 'hidden', bgcolor: 'background.paper' }}>
               <InputBase
@@ -168,24 +158,6 @@ const BrandHeader = () => {
                 onChange={(e) => { setSearchTerm(e.target.value); setShowSuggestions(true); }}
                 onFocus={() => setShowSuggestions(true)}
                 onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
-                onKeyDown={(e) => {
-                  if (e.key === 'ArrowDown') {
-                    e.preventDefault();
-                    if (filteredSuggestions.length === 0) return;
-                    setActiveSuggestion((prev) => prev >= filteredSuggestions.length - 1 ? 0 : prev + 1);
-                  } else if (e.key === 'ArrowUp') {
-                    e.preventDefault();
-                    setActiveSuggestion((prev) => prev <= 0 ? filteredSuggestions.length - 1 : prev - 1);
-                  } else if (e.key === 'Enter') {
-                    if (showSuggestions && activeSuggestion >= 0) {
-                      setSearchTerm(filteredSuggestions[activeSuggestion]);
-                      setShowSuggestions(false);
-                      return;
-                    }
-                    handleSearch();
-                  } else if (e.key === 'Escape') setShowSuggestions(false);
-                }}
-                inputProps={{ autoComplete: 'off' }}
                 sx={{ ml: 2, flex: 1, fontSize: '0.95rem', color: 'text.primary' }}
               />
               <Select
@@ -203,40 +175,9 @@ const BrandHeader = () => {
                 Search
               </Button>
             </Box>
-
-            {showSuggestions && filteredSuggestions.length > 0 && (
-              <Box sx={{ position: 'absolute', top: '46px', left: 0, right: 0, bgcolor: 'background.paper', border: '1px solid', borderColor: 'divider', borderRadius: '8px', boxShadow: 2, zIndex: 1200 }}>
-                {filteredSuggestions.map((item, index) => (
-                  <Box key={item} onMouseDown={(e) => e.preventDefault()} onClick={() => { setSearchTerm(item); setShowSuggestions(false); }}
-                    sx={{ px: 2, py: 1, cursor: 'pointer', bgcolor: activeSuggestion === index ? 'action.hover' : 'transparent', '&:hover': { bgcolor: 'action.hover' } }}
-                  >
-                    <Typography sx={{ fontSize: '0.9rem', color: 'text.primary' }}>{item}</Typography>
-                  </Box>
-                ))}
-              </Box>
-            )}
-
-            {showSuggestions && filteredSuggestions.length === 0 && searchCategory === 'All category' && !searchTerm.trim() && (
-              <Box sx={{ position: 'absolute', top: '46px', left: 0, right: 0, bgcolor: 'background.paper', border: '1px solid', borderColor: 'divider', borderRadius: '8px', boxShadow: 2, zIndex: 1200, p: 1, display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 1 }}>
-                {categoryCards.map(({ category, product }) => (
-                  <Box key={category} onMouseDown={(e) => e.preventDefault()}
-                    onClick={() => {
-                      const slug = category.toLowerCase().replace(/\s+/g, '-');
-                      setShowSuggestions(false);
-                      router.push(`/shop?category=${slug}`);
-                    }}
-                    sx={{ display: 'flex', alignItems: 'center', gap: 1, p: 1, border: '1px solid', borderColor: 'divider', borderRadius: '6px', cursor: 'pointer', '&:hover': { bgcolor: 'action.hover' } }}
-                  >
-                    <Box sx={{ width: 36, height: 36, position: 'relative', flexShrink: 0 }}>
-                      <Image src={product.img || product.image} alt={product.title} fill sizes="36px" style={{ objectFit: 'contain' }} />
-                    </Box>
-                    <Typography sx={{ fontSize: '0.9rem', color: 'text.primary' }}>{category}</Typography>
-                  </Box>
-                ))}
-              </Box>
-            )}
           </Box>
 
+          {/* Desktop Header Actions */}
           <Stack direction="row" spacing={2} alignItems="center" sx={{ display: { xs: 'none', md: 'flex' } }}>
             <HeaderAction icon={<Person />} label="Profile" onClick={handleProfileOpen} />
             <HeaderAction icon={<Chat />} label="Message" />
@@ -244,22 +185,45 @@ const BrandHeader = () => {
             <Link href="/cart" style={{ textDecoration: 'none' }}>
               <HeaderAction icon={<Badge badgeContent={cartCount} color="error"><ShoppingCart /></Badge>} label="My cart" />
             </Link>
+            
             <IconButton onClick={themeMode.toggleColorMode} size="small">
-              {isDark ? <WbSunny fontSize="small" sx={{ color: '#FFD700' }} /> : <DarkMode fontSize="small" />}
+              {/* SWAP ICON: If Dark, show Sun. If Light, show Moon */}
+              {isDark ? (
+                <WbSunny fontSize="small" sx={{ color: '#FFD700' }} />
+              ) : (
+                <DarkMode fontSize="small" sx={{ color: '#4A5568' }} />
+              )}
             </IconButton>
           </Stack>
         </Toolbar>
       </Container>
 
-      <Menu anchorEl={profileAnchorEl} open={Boolean(profileAnchorEl)} onClose={handleProfileClose}>
-        <MenuItem disabled>Account holder: Guest</MenuItem>
-        <MenuItem onClick={() => handleProfileAction('/history')}>Browsing history</MenuItem>
-        <MenuItem onClick={() => handleProfileAction('/settings')}>Account settings</MenuItem>
+      {/* Profile Menu */}
+      <Menu 
+        anchorEl={profileAnchorEl} 
+        open={Boolean(profileAnchorEl)} 
+        onClose={handleProfileClose}
+        PaperProps={{ sx: { width: '220px', mt: 1, borderRadius: '8px' } }}
+      >
+        <MenuItem disabled sx={{ opacity: '1 !important', color: 'text.primary', fontWeight: 600 }}>
+          Account holder: Guest
+        </MenuItem>
+        <Divider />
+        <MenuItem onClick={() => handleProfileAction('/profile')}>
+          <Stack direction="row" spacing={1.5} alignItems="center">
+            <Person fontSize="small" sx={{ color: '#0D6EFD' }} />
+            <Typography variant="body2">My Profile</Typography>
+          </Stack>
+        </MenuItem>
         <MenuItem onClick={() => handleProfileAction('/logout')}>
-          <Stack direction="row" spacing={1} alignItems="center"><Logout fontSize="small" /><Typography>Logout</Typography></Stack>
+          <Stack direction="row" spacing={1.5} alignItems="center">
+            <Logout fontSize="small" sx={{ color: 'error.main' }} />
+            <Typography variant="body2" sx={{ color: 'error.main' }}>Logout</Typography>
+          </Stack>
         </MenuItem>
       </Menu>
 
+      {/* Mobile Drawer */}
       <Drawer anchor="left" open={drawerOpen} onClose={() => setDrawerOpen(false)}>
         <Box sx={{ width: 250 }} onClick={() => setDrawerOpen(false)}>
           <List sx={{ pt: 2 }}>
