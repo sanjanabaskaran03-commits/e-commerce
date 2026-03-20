@@ -1,30 +1,52 @@
-"use client"
-import React from 'react';
+"use client";
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { useRouter } from "next/navigation"; 
 import {
-  Box, Typography, Stack, useTheme
+  Box, Typography, Stack, useTheme, CircularProgress
 } from '@mui/material';
 import LayoutContainer from '@/src/app/components/common/LayoutContainer';
-import Wallet from '@/public/images/homepage/recommended_items/wallet.png';
-import Smartwatch from '@/public/images/homepage/deals/watch.png';
-import Headphone from '@/public/images/homepage/recommended_items/headphone.png'; 
-import Poco from '@/public/images/homepage/categories/tab.png';
-import Canon from '@/public/images/homepage/deals/camera.png';
-import Watch from '@/public/images/homepage/deals/phone.png';
 
 const RelatedProducts = () => {
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
   const borderColor = theme.palette.divider;
+  const router = useRouter();
 
-  const productsArray = [
-    { id: 1, title: 'Wallet', price: '$32.00-$60.00', img: Wallet },
-    { id: 2, title: 'Smart watch', price: '$20.00-$40.00', img: Smartwatch },
-    { id: 3, title: 'Headphone', price: '$40.00-$80.00', img: Headphone },
-    { id: 4, title: 'Poco X5 Pro 5G', price: '$32.00-$40.00', img: Poco },
-    { id: 5, title: 'Canon Camera', price: '$60.00-$70.00', img: Canon },
-    { id: 6, title: "Huawei Watch ", price: '$32.00-$42.00', img: Watch }
-  ];
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchRelated = async () => {
+      try {
+        setLoading(true);
+        const res = await fetch('/api/products');
+        const data = await res.json();
+
+        if (Array.isArray(data)) {
+          const randomProducts = data
+            .sort(() => 0.5 - Math.random())
+            .slice(0, 6);
+          setProducts(randomProducts);
+        }
+      } catch (error) {
+        console.error("Error fetching related products:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchRelated();
+  }, []);
+
+  if (loading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', p: 5 }}>
+        <CircularProgress size={24} />
+      </Box>
+    );
+  }
+
+  if (products.length === 0) return null;
 
   return (
     <LayoutContainer>
@@ -50,6 +72,7 @@ const RelatedProducts = () => {
             justifyContent: { md: 'space-between' },
             overflowX: 'auto', 
             pb: { xs: 2, md: 0 }, 
+            // FIXED: Scrollbar is completely hidden on desktop/md+
             '&::-webkit-scrollbar': { 
               height: '4px',
               display: { xs: 'block', md: 'none' } 
@@ -58,16 +81,18 @@ const RelatedProducts = () => {
               bgcolor: 'divider', 
               borderRadius: '10px' 
             },
+            // FIXED: Hover effect only shows scrollbar on mobile/xs
             '&:hover::-webkit-scrollbar': {
-              display: 'block'
+              display: { xs: 'block', md: 'none' }
             }
           }}
         >
-          {productsArray.map((item) => (
+          {products.map((item) => (
             <Stack 
-              key={item.id} 
+              key={item._id} 
               direction="column" 
               alignItems="flex-start"
+              onClick={() => router.push(`/detail/${item._id}`)}
               sx={{ 
                 flex: { xs: '0 0 auto', md: '1 1 auto' }, 
                 minWidth: { xs: '140px', md: '120px' },
@@ -84,8 +109,7 @@ const RelatedProducts = () => {
                   border: '1px solid',
                   borderColor: borderColor,
                   p: 1,
-                  objectFit: 'contain',
-                  bgcolor: isDark ? 'white' : 'transparent' ,
+                  bgcolor: '#fff', 
                   transition: 'transform 0.2s',
                   '&:hover': {
                     transform: 'scale(1.02)'
@@ -99,7 +123,7 @@ const RelatedProducts = () => {
                   sizes="(max-width: 768px) 140px, 180px"
                   style={{ objectFit: 'contain', padding: '8px' }}
                 />
-                </Box>
+              </Box>
               <Box sx={{ width: '100%' }}>
                 <Typography 
                   sx={{ 
@@ -120,7 +144,7 @@ const RelatedProducts = () => {
                   {item.title}
                 </Typography>
                 <Typography sx={{ color: '#8B96A5', mt: 0.5, textAlign: "left", fontSize: "14px" }}>
-                  {item.price}
+                  ${item.price}
                 </Typography>
               </Box>
             </Stack>

@@ -14,23 +14,37 @@ const BreadcrumbSection = () => {
   const searchParams = useSearchParams();
   const params = useParams(); 
 
-  // 1. State for the current product from DB
   const [currentProduct, setCurrentProduct] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  // Get category from search bar (list page) or product data (detail page)
   const categoryQuery = searchParams.get('category');
-  const productId = params?.id; // This is now a MongoDB String ID
+  const productId = params?.id; 
 
-  // 2. Fetch product info if we are on a detail page
   useEffect(() => {
     const fetchBreadcrumbData = async () => {
-      if (productId && pathname.includes('/detail')) {
+      // Check if we are currently on the detail page
+      if (pathname.startsWith('/detail')) {
         try {
           setLoading(true);
-          const res = await fetch(`/api/products/${productId}`);
-          if (res.ok) {
-            const data = await res.json();
-            setCurrentProduct(data);
+          if (productId) {
+            const res = await fetch(`/api/products/${productId}`);
+            if (res.ok) {
+              const data = await res.json();
+              setCurrentProduct(data);
+              return;
+            }
+          }
+
+          // Fallback: use first product when no ID or failed fetch
+          const listRes = await fetch('/api/products');
+          if (listRes.ok) {
+            const listData = await listRes.json();
+            const fallbackProduct =
+              (productId && listData.find((item) => item._id === productId)) ||
+              listData[0] ||
+              null;
+            setCurrentProduct(fallbackProduct);
           }
         } catch (error) {
           console.error("Breadcrumb fetch error:", error);
@@ -38,13 +52,13 @@ const BreadcrumbSection = () => {
           setLoading(false);
         }
       } else {
-        // Reset if we leave the detail page
+        // Clear product state when on Shop or Home pages
         setCurrentProduct(null);
       }
     };
 
     fetchBreadcrumbData();
-  }, [productId, pathname]);
+  }, [productId, pathname]); // Re-run when ID or Path changes
 
   const formatText = (text) => {
     if (!text) return "";
@@ -73,19 +87,19 @@ const BreadcrumbSection = () => {
             } 
           }}
         >
-          {/* Always Home */}
+          {/* 1. Home Link */}
           <Link underline="hover" color="inherit" href="/">
             Home
           </Link>
 
-          {/* Shop Link */}
-          {(pathname.includes('/shop') || pathname.includes('/detail')) && (
+          {/* 2. Shop Link (visible on shop and detail pages) */}
+          {(pathname.includes('/shop') || pathname.startsWith('/detail')) && (
             <Link underline="hover" color="inherit" href="/shop">
               Shop
             </Link>
           )}
 
-          {/* Dynamic Category Link */}
+          {/* 3. Category Link (Fallback to currentProduct.category if URL param is missing) */}
           {(categoryQuery || (currentProduct && currentProduct.category)) && (
             <Link 
               underline="hover" 
@@ -96,21 +110,19 @@ const BreadcrumbSection = () => {
             </Link>
           )}
 
-          {/* Current Product Title */}
-          {currentProduct && (
+          {/* 4. Product Title (Only visible on Detail page) */}
+          {pathname.startsWith('/detail') && currentProduct && (
             <Typography 
-              sx={{  
+              sx={{   
                 fontSize: { xs: '13px', md: '14px' },
-                color: 'text.primary',
-                fontWeight: 500
+                color: 'inherit',
               }}
             >
               {currentProduct.title}
             </Typography>
           )}
 
-          {/* Optional: Show loading indicator if fetching product title */}
-          {loading && <CircularProgress size={14} sx={{ ml: 1 }} />}
+          {loading && <CircularProgress size={14} sx={{ ml: 1, verticalAlign: 'middle' }} />}
         </Breadcrumbs>
       </Box>
     </LayoutContainer>
